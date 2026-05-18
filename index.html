@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evolution Spa & Peluquería | Córdoba</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Syne:wght@400;500;600;700;800&family=Bebas+Neue&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- GRAIN OVERLAY -->
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- CURSOR -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- CANVAS FONDO -->
+  <canvas id="heroCanvas"></canvas>
+
+  <!-- BOTÓN FLOTANTE MOBILE -->
+  <a href="tel:03513115571" class="fab" aria-label="Llamar ahora">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path
+        d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.5 11.5 0 00.57 3.6 1 1 0 01-.25 1.01l-2.2 2.18z" />
+    </svg>
+    <span>Llamar</span>
+  </a>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-mark">E</span>
+        <span class="logo-text">volution</span>
+        <span class="logo-sub">Spa & Peluquería</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#galeria">Galería</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#opiniones">Opiniones</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <button class="btn btn-nav" id="navReservar">Reservar</button>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#servicios">Servicios</a>
+      <a href="#galeria">Galería</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#opiniones">Opiniones</a>
+      <a href="#contacto">Contacto</a>
+      <button class="btn btn-mobile open-modal" style="border:none;">Reservar turno online</button>
+      <a href="tel:03513115571" class="btn btn-mobile"
+        style="background:transparent;border:1.5px solid rgba(201,168,76,.35);color:var(--gold);">Llamar · 0351
+        311-5571</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        <span>Abierto hoy · Cierra a las 8 p.m.</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="title-line" data-text="Tu mejor">Tu mejor</span>
+        <em class="title-line italic" data-text="versión">versión</em>
+        <span class="title-line" data-text="comienza aquí">comienza aquí</span>
+      </h1>
+      <p class="hero-subtitle">
+        Cortes, tinturas y tratamientos spa para hombres y mujeres.<br>
+        Atención artesanal en el corazón de Córdoba.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary open-modal">
+          <svg viewBox="0 0 24 24" class="btn-icon" fill="currentColor">
+            <path
+              d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z" />
+          </svg>
+          Reservar turno
+        </button>
+        <a href="#servicios" class="btn btn-ghost">Ver servicios ↓</a>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-stars">
+          <span class="star filled">★</span><span class="star filled">★</span>
+          <span class="star filled">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <span class="meta-text"><strong>3.4</strong> — 220 reseñas Google</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-text">Córdoba, Argentina</span>
+      </div>
+    </div>
+    <div class="hero-deco">
+      <div class="deco-ring deco-ring-1"></div>
+      <div class="deco-ring deco-ring-2"></div>
+      <div class="deco-ring deco-ring-3"></div>
+      <div class="deco-scissors">✂</div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-track">
+        <div class="scroll-thumb"></div>
+      </div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Evolution Spa &amp; Peluquería</span><span class="msep">✦</span>
+      <span>Córdoba, Argentina</span><span class="msep">✦</span>
+      <span>Cortes · Coloración · Tratamientos</span><span class="msep">✦</span>
+      <span>Atención artesanal</span><span class="msep">✦</span>
+      <span>0351 311-5571</span><span class="msep">✦</span>
+      <span>Desde 2019</span><span class="msep">✦</span>
+      <span>Evolution Spa &amp; Peluquería</span><span class="msep">✦</span>
+      <span>Córdoba, Argentina</span><span class="msep">✦</span>
+      <span>Cortes · Coloración · Tratamientos</span><span class="msep">✦</span>
+      <span>Atención artesanal</span><span class="msep">✦</span>
+      <span>0351 311-5571</span><span class="msep">✦</span>
+      <span>Desde 2019</span><span class="msep">✦</span>
+    </div>
+  </div>
+
+  <!-- BANDA DE DATOS -->
+  <section class="info-band">
+    <div class="info-band-inner">
+      <div class="info-item reveal">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+          </svg>
+        </div>
+        <div class="info-text">
+          <strong>Dirección</strong>
+          <span>Mariano Fragueiro 11, Córdoba</span>
+        </div>
+      </div>
+      <div class="info-item reveal">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.5 11.5 0 00.57 3.6 1 1 0 01-.25 1.01l-2.2 2.18z" />
+          </svg>
+        </div>
+        <div class="info-text">
+          <strong>Teléfono</strong>
+          <span>0351 311-5571</span>
+        </div>
+      </div>
+      <div class="info-item reveal">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm.5 5v5.25l4.5 2.67-.75 1.23-5.25-3.15V7h1.5z" />
+          </svg>
+        </div>
+        <div class="info-text">
+          <strong>Horario</strong>
+          <span>Lun – Sáb · Hasta las 8 p.m.</span>
+        </div>
+      </div>
+      <div class="info-item reveal">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z" />
+          </svg>
+        </div>
+        <div class="info-text">
+          <strong>Calificación</strong>
+          <span>3.4 / 5 · 220 reseñas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESTADÍSTICAS -->
+  <section class="stats">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="5">0</div>
+        <div class="stat-label">Años de experiencia</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="3200">0</div>
+        <div class="stat-label">Clientes atendidos</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="6">0</div>
+        <div class="stat-label">Servicios especializados</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="220">0</div>
+        <div class="stat-label">Reseñas en Google</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="servicios" id="servicios">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-label">Lo que hacemos</span>
+        <h2>Nuestros servicios</h2>
+        <p>Cada visita es una experiencia diseñada para que te vayas sintiéndote increíble.</p>
+      </div>
+      <div class="servicios-grid">
+        <div class="servicio-card reveal" data-num="01">
+          <div class="card-border-sweep"></div>
+          <div class="servicio-icon-wrap">
+            <span class="servicio-icon">✂</span>
+          </div>
+          <h3>Corte de cabello</h3>
+          <p>Cortes clásicos y modernos adaptados a tu estilo, forma de cara y preferencias personales.</p>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="servicio-card featured reveal" data-num="02">
+          <div class="card-border-sweep"></div>
+          <div class="servicio-badge">Popular</div>
+          <div class="servicio-icon-wrap">
+            <span class="servicio-icon">◈</span>
+          </div>
+          <h3>Tintura & Coloración</h3>
+          <p>Desde mechas y balayage hasta cambios de color completos con productos de alta calidad.</p>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="servicio-card reveal" data-num="03">
+          <div class="card-border-sweep"></div>
+          <div class="servicio-icon-wrap">
+            <span class="servicio-icon">◉</span>
+          </div>
+          <h3>Tratamientos Spa</h3>
+          <p>Hidratación profunda, keratinas y tratamientos capilares para restaurar tu cabello.</p>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="servicio-card reveal" data-num="04">
+          <div class="card-border-sweep"></div>
+          <div class="servicio-icon-wrap">
+            <span class="servicio-icon">✦</span>
+          </div>
+          <h3>Styling & Peinados</h3>
+          <p>Peinados para eventos especiales, bodas o el día a día. Te hacemos lucir perfecto.</p>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="servicio-card reveal" data-num="05">
+          <div class="card-border-sweep"></div>
+          <div class="servicio-icon-wrap">
+            <span class="servicio-icon">⌁</span>
+          </div>
+          <h3>Afeitado & Barba</h3>
+          <p>Afeitado tradicional con navaja y perfilado de barba con técnica artesanal.</p>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="servicio-card reveal" data-num="06">
+          <div class="card-border-sweep"></div>
+          <div class="servicio-icon-wrap">
+            <span class="servicio-icon">❋</span>
+          </div>
+          <h3>Cuidado capilar</h3>
+          <p>Masajes capilares y tratamientos anticaída para la salud y vitalidad de tu cabello.</p>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALERÍA ANTES/DESPUÉS -->
+  <section class="galeria" id="galeria">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-label">Nuestro trabajo</span>
+        <h2>Transformaciones</h2>
+        <p>Cada corte cuenta una historia. Deslizá para ver el antes y después.</p>
+      </div>
+      <div class="galeria-grid">
+        <div class="galeria-card reveal">
+          <div class="before-after">
+            <div class="before-side">
+              <span class="ba-label">Antes</span>
+              <div class="ba-visual ba-before-1"></div>
+            </div>
+            <div class="after-side">
+              <span class="ba-label">Después</span>
+              <div class="ba-visual ba-after-1"></div>
+            </div>
+            <div class="ba-divider">
+              <div class="ba-handle">◈</div>
+            </div>
+          </div>
+          <div class="galeria-info">
+            <strong>Corte + Barba</strong>
+            <span>Estilo clásico · 90 min</span>
+          </div>
+        </div>
+        <div class="galeria-card reveal">
+          <div class="before-after">
+            <div class="before-side">
+              <span class="ba-label">Antes</span>
+              <div class="ba-visual ba-before-2"></div>
+            </div>
+            <div class="after-side">
+              <span class="ba-label">Después</span>
+              <div class="ba-visual ba-after-2"></div>
+            </div>
+            <div class="ba-divider">
+              <div class="ba-handle">◈</div>
+            </div>
+          </div>
+          <div class="galeria-info">
+            <strong>Balayage Dorado</strong>
+            <span>Coloración · 2.5 hrs</span>
+          </div>
+        </div>
+        <div class="galeria-card reveal">
+          <div class="before-after">
+            <div class="before-side">
+              <span class="ba-label">Antes</span>
+              <div class="ba-visual ba-before-3"></div>
+            </div>
+            <div class="after-side">
+              <span class="ba-label">Después</span>
+              <div class="ba-visual ba-after-3"></div>
+            </div>
+            <div class="ba-divider">
+              <div class="ba-handle">◈</div>
+            </div>
+          </div>
+          <div class="galeria-info">
+            <strong>Keratina Premium</strong>
+            <span>Tratamiento spa · 3 hrs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOSOTROS -->
+  <section class="nosotros" id="nosotros">
+    <div class="section-inner nosotros-inner">
+      <div class="nosotros-visual reveal">
+        <div class="nosotros-art">
+          <div class="art-circle art-c1"></div>
+          <div class="art-circle art-c2"></div>
+          <div class="art-circle art-c3"></div>
+          <div class="art-lines">
+            <div class="art-line"></div>
+            <div class="art-line"></div>
+            <div class="art-line"></div>
+          </div>
+          <div class="art-glyph">✂</div>
+          <div class="art-badge">
+            <div class="badge-year">+5</div>
+            <div class="badge-text">años<br>de arte</div>
+          </div>
+        </div>
+      </div>
+      <div class="nosotros-content reveal">
+        <span class="section-label">Quiénes somos</span>
+        <h2>Pasión por el detalle, dedicación en cada corte</h2>
+        <p>
+          En <strong>Evolution Spa & Peluquería</strong> creemos que el cabello es una extensión
+          de tu personalidad. Nuestro equipo trabaja con dedicación para que cada cliente salga
+          sintiéndose su mejor versión.
+        </p>
+        <p>
+          Ubicados en el corazón de Córdoba, ofrecemos un ambiente cálido donde la atención
+          personalizada es nuestra prioridad. Técnicas clásicas con tendencias actuales.
+        </p>
+        <ul class="nosotros-features">
+          <li><span class="feat-num">01</span><span>Profesionales capacitados y en constante actualización</span></li>
+          <li><span class="feat-num">02</span><span>Productos de primera calidad para cuidar tu cabello</span></li>
+          <li><span class="feat-num">03</span><span>Atención personalizada adaptada a cada cliente</span></li>
+          <li><span class="feat-num">04</span><span>Ambiente cómodo y moderno en pleno centro</span></li>
+        </ul>
+        <button class="btn btn-primary open-modal">Reservar mi turno</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESO / CÓMO FUNCIONA -->
+  <section class="proceso">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-label">Proceso</span>
+        <h2>Cómo funciona</h2>
+        <p>Tu experiencia en Evolution, paso a paso.</p>
+      </div>
+      <div class="proceso-timeline">
+        <div class="proceso-step reveal">
+          <div class="step-number">01</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Reservá tu turno</h3>
+            <p>Llamanos o visitanos directamente. No necesitás app ni registro. Simple y rápido.</p>
+          </div>
+        </div>
+        <div class="proceso-step reveal">
+          <div class="step-number">02</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Consulta personalizada</h3>
+            <p>Al llegar, nuestros especialistas analizan tu cabello y estilo para recomendarte lo mejor.</p>
+          </div>
+        </div>
+        <div class="proceso-step reveal">
+          <div class="step-number">03</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Tu transformación</h3>
+            <p>Disfrutá el proceso en un ambiente relajado con atención artesanal de principio a fin.</p>
+          </div>
+        </div>
+        <div class="proceso-step reveal">
+          <div class="step-number">04</div>
+          <div class="step-content">
+            <h3>Resultado garantizado</h3>
+            <p>Salís luciendo increíble. Si algo no te convence, lo ajustamos sin costo adicional.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPINIONES -->
+  <section class="opiniones" id="opiniones">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-label">Lo que dicen nuestros clientes</span>
+        <h2>Opiniones</h2>
+        <div class="rating-overview">
+          <div class="rating-big">3.4</div>
+          <div class="rating-details">
+            <div class="stars-big">
+              <span class="star filled">★</span><span class="star filled">★</span>
+              <span class="star filled">★</span><span class="star">★</span><span class="star">★</span>
+            </div>
+            <span>Basado en 220 reseñas de Google</span>
+          </div>
+        </div>
+      </div>
+      <div class="opiniones-grid">
+        <div class="opinion-card reveal">
+          <div class="opinion-quote">"</div>
+          <p>Muy buena atención y dedicación en el trabajo, me dejaron divino el pelo. Se nota que se preocupan por cada
+            cliente.</p>
+          <div class="opinion-footer">
+            <div class="opinion-avatar">M</div>
+            <div>
+              <strong>María G.</strong>
+              <div class="opinion-stars">★★★★★</div>
+            </div>
+          </div>
+        </div>
+        <div class="opinion-card reveal">
+          <div class="opinion-quote">"</div>
+          <p>Excelente servicio y muy cálida la atención. El ambiente es agradable y el resultado final superó mis
+            expectativas.</p>
+          <div class="opinion-footer">
+            <div class="opinion-avatar">C</div>
+            <div>
+              <strong>Carlos R.</strong>
+              <div class="opinion-stars">★★★★★</div>
+            </div>
+          </div>
+        </div>
+        <div class="opinion-card reveal">
+          <div class="opinion-quote">"</div>
+          <p>Me encantó la tintura que me hicieron. El equipo es muy profesional y el local está muy bien equipado.
+            Vuelvo seguro.</p>
+          <div class="opinion-footer">
+            <div class="opinion-avatar">L</div>
+            <div>
+              <strong>Laura V.</strong>
+              <div class="opinion-stars">★★★★☆</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="opiniones-cta reveal">
+        <p>¿Ya fuiste? Contanos tu experiencia en Google.</p>
+        <a href="https://maps.google.com" target="_blank" rel="noopener" class="btn btn-ghost">Dejar mi opinión ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="contacto" id="contacto">
+    <div class="section-inner contacto-inner">
+      <div class="contacto-info reveal">
+        <span class="section-label">Estamos para vos</span>
+        <h2>Reservá tu turno hoy</h2>
+        <p>Comunicate con nosotros por teléfono o visitanos directamente. No necesitás turno previo, pero llamar
+          garantiza tu horario.</p>
+        <div class="contacto-datos">
+          <div class="contacto-dato">
+            <div class="dato-icon">◎</div>
+            <div>
+              <strong>Dirección</strong>
+              <span>Mariano Fragueiro 11, X5000 Córdoba</span>
+            </div>
+          </div>
+          <div class="contacto-dato">
+            <div class="dato-icon">◉</div>
+            <div>
+              <strong>Teléfono</strong>
+              <a href="tel:03513115571">0351 311-5571</a>
+            </div>
+          </div>
+          <div class="contacto-dato">
+            <div class="dato-icon">◐</div>
+            <div>
+              <strong>Horario de atención</strong>
+              <span>Lunes a Sábado · Hasta las 8 p.m.</span>
+            </div>
+          </div>
+        </div>
+        <a href="tel:03513115571" class="btn btn-primary btn-large">
+          <svg viewBox="0 0 24 24" class="btn-icon" fill="currentColor">
+            <path
+              d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.5 11.5 0 00.57 3.6 1 1 0 01-.25 1.01l-2.2 2.18z" />
+          </svg>
+          Llamar: 0351 311-5571
+        </a>
+      </div>
+      <div class="contacto-mapa reveal">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3405.3!2d-64.1858!3d-31.4135!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMariano+Fragueiro+11+Córdoba!5e0!3m2!1ses!2sar!4v1"
+          width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade" title="Ubicación Evolution Spa & Peluquería">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo footer-logo">
+            <span class="logo-mark">E</span>
+            <span class="logo-text">volution</span>
+            <span class="logo-sub">Spa & Peluquería</span>
+          </a>
+          <p class="footer-tagline">Tu mejor versión comienza aquí.</p>
+          <div class="footer-social">
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </a>
+            <a href="https://wa.me/5493513115571" class="social-link" aria-label="WhatsApp">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Servicios</h4>
+            <ul>
+              <li><a href="#servicios">Corte de cabello</a></li>
+              <li><a href="#servicios">Tintura & Coloración</a></li>
+              <li><a href="#servicios">Tratamientos Spa</a></li>
+              <li><a href="#servicios">Afeitado & Barba</a></li>
+              <li><a href="#servicios">Cuidado capilar</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Contacto</h4>
+            <ul>
+              <li><a href="tel:03513115571">0351 311-5571</a></li>
+              <li><span>Mariano Fragueiro 11</span></li>
+              <li><span>X5000 Córdoba, Argentina</span></li>
+              <li><span>Lun – Sáb · 9 a.m. – 8 p.m.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Evolution Spa & Peluquería · Todos los derechos reservados.</p>
+        <p class="footer-love">Hecho con ✦ en Córdoba</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL RESERVA -->
+  <div class="modal-overlay" id="modalReserva" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose" aria-label="Cerrar">&#x2715;</button>
+
+      <!-- Formulario -->
+      <div id="modalFormWrap">
+        <div class="modal-header">
+          <span class="section-label">Agenda tu visita</span>
+          <h2 id="modalTitle">Reservar turno</h2>
+        </div>
+        <div class="form-error-msg" id="formErrorMsg"></div>
+        <form class="reserva-form" id="reservaForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rf-nombre">Tu nombre *</label>
+              <input type="text" id="rf-nombre" name="nombre" placeholder="Ej: Martín García" required
+                autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label for="rf-telefono">Teléfono *</label>
+              <input type="tel" id="rf-telefono" name="telefono" placeholder="Ej: 0351 123-4567" required
+                autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rf-servicio">Servicio *</label>
+            <select id="rf-servicio" name="servicio" required>
+              <option value="" disabled selected>Seleccioná un servicio</option>
+              <option value="Corte de cabello">Corte de cabello</option>
+              <option value="Tintura & Coloración">Tintura &amp; Coloración</option>
+              <option value="Tratamientos Spa">Tratamientos Spa</option>
+              <option value="Styling & Peinados">Styling &amp; Peinados</option>
+              <option value="Afeitado & Barba">Afeitado &amp; Barba</option>
+              <option value="Cuidado capilar">Cuidado capilar</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rf-fecha">Fecha *</label>
+              <input type="date" id="rf-fecha" name="fecha" required>
+            </div>
+            <div class="form-group">
+              <label for="rf-hora">Horario *</label>
+              <select id="rf-hora" name="hora" required>
+                <option value="" disabled selected>Seleccioná un horario</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rf-mensaje">Comentarios (opcional)</label>
+            <textarea id="rf-mensaje" name="mensaje" rows="3"
+              placeholder="¿Algo especial que debamos saber?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-submit" id="reservaSubmit">
+            Confirmar reserva
+          </button>
+        </form>
+      </div>
+
+      <!-- Confirmación -->
+      <div class="reserva-success" id="reservaSuccess" hidden>
+        <div class="success-icon">&#x2713;</div>
+        <h3>¡Turno solicitado!</h3>
+        <p>Te contactaremos para confirmar tu reserva.<br>
+          También podés llamarnos al <a href="tel:03513115571">0351 311-5571</a>.</p>
+        <button class="btn btn-ghost" id="successClose">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="main.js"></script>
+</body>
+
+</html>

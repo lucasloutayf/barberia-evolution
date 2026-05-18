@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Evolution Spa & Peluquería</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet" />
+</head>
+<body class="admin-body">
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <a href="index.html" class="nav-logo login-logo">
+        <span class="logo-mark">E</span>
+        <span class="logo-text">volution</span>
+      </a>
+      <span class="section-label">Panel de administración</span>
+      <h2 class="login-title">Acceso privado</h2>
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="adminEmail">Email</label>
+          <input type="email" id="adminEmail" value="kakagg1704@gmail.com" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="adminPass">Contraseña</label>
+          <input type="password" id="adminPass" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div class="form-error-msg" id="loginError" style="display:none"></div>
+        <button type="button" id="loginBtn" class="btn btn-primary btn-submit">Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="dashboard" style="display:none">
+
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <a href="index.html" class="nav-logo">
+          <span class="logo-mark">E</span>
+          <span class="logo-text">volution</span>
+          <span class="logo-sub">Admin</span>
+        </a>
+        <div class="admin-header-actions">
+          <button id="refreshBtn" class="btn btn-ghost btn-sm">&#8635; Actualizar</button>
+          <button id="logoutBtn" class="btn btn-ghost btn-sm">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main">
+
+      <!-- Stats -->
+      <div class="admin-stats">
+        <div class="admin-stat-card">
+          <div class="asc-number" id="statTotal">—</div>
+          <div class="asc-label">Total reservas</div>
+        </div>
+        <div class="admin-stat-card asc-pending">
+          <div class="asc-number" id="statPendiente">—</div>
+          <div class="asc-label">Pendientes</div>
+        </div>
+        <div class="admin-stat-card asc-confirmed">
+          <div class="asc-number" id="statConfirmada">—</div>
+          <div class="asc-label">Confirmadas</div>
+        </div>
+        <div class="admin-stat-card asc-today">
+          <div class="asc-number" id="statHoy">—</div>
+          <div class="asc-label">Hoy</div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="admin-filters">
+        <div class="filter-group">
+          <label>Estado</label>
+          <select id="filterEstado">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Fecha del turno</label>
+          <input type="date" id="filterFecha">
+        </div>
+        <div class="filter-group">
+          <label>Buscar cliente</label>
+          <input type="text" id="filterNombre" placeholder="Nombre o teléfono…">
+        </div>
+        <button id="clearFilters" class="btn btn-ghost btn-sm filter-clear">Limpiar</button>
+      </div>
+
+      <!-- Tabla -->
+      <div class="reservas-table-wrap">
+        <div id="loadingRow" class="table-loading">Cargando reservas…</div>
+        <table class="reservas-table" id="reservasTable" style="display:none">
+          <thead>
+            <tr>
+              <th>Recibida</th>
+              <th>Turno</th>
+              <th>Cliente</th>
+              <th>Teléfono</th>
+              <th>Servicio</th>
+              <th>Comentario</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="reservasTbody"></tbody>
+        </table>
+        <div id="emptyRow" class="table-empty" style="display:none">
+          No hay reservas que coincidan con los filtros.
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

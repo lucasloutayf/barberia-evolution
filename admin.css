@@ -1,0 +1,348 @@
+/* =====================
+   ADMIN PANEL — Evolution Spa
+   ===================== */
+
+.admin-body {
+  background: var(--ink);
+  min-height: 100vh;
+  cursor: auto !important;
+}
+
+/* ---- Login ---- */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(201,168,76,.07) 0%, transparent 55%),
+    var(--ink);
+}
+
+.login-box {
+  background: var(--ink-3);
+  border: 1px solid rgba(201,168,76,.18);
+  border-radius: var(--r-lg);
+  padding: 2.75rem 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.55);
+}
+
+.login-logo { margin-bottom: 1.5rem; }
+
+.login-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: .25rem 0 1.75rem;
+}
+
+/* ---- Header ---- */
+.admin-header {
+  background: rgba(8,8,7,.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(201,168,76,.12);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.admin-header-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: .9rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+
+.btn-sm {
+  padding: .45rem 1.1rem !important;
+  font-size: .8rem !important;
+}
+
+/* ---- Main ---- */
+.admin-main {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ---- Stats ---- */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.admin-stat-card {
+  background: var(--ink-3);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: var(--r-md);
+  padding: 1.4rem 1.5rem;
+  transition: border-color .2s;
+}
+
+.admin-stat-card:hover { border-color: rgba(201,168,76,.18); }
+
+.admin-stat-card.asc-pending  { border-color: rgba(251,191,36,.15); }
+.admin-stat-card.asc-confirmed { border-color: rgba(74,222,128,.15); }
+.admin-stat-card.asc-today    { border-color: rgba(201,168,76,.2); }
+
+.asc-number {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: .35rem;
+}
+
+.asc-label {
+  font-size: .75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+/* ---- Filtros ---- */
+.admin-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--ink-3);
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: var(--r-md);
+  padding: 1.25rem 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  min-width: 160px;
+  flex: 1;
+}
+
+.filter-group label {
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--cream-dim);
+}
+
+.filter-group input,
+.filter-group select {
+  background: var(--ink-4);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: var(--r-sm);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  padding: .6rem .9rem;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.filter-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath fill='%236E6A62' d='M1 1l7 7 7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .8rem center;
+  background-size: 11px;
+  padding-right: 2.2rem;
+  cursor: pointer;
+}
+
+.filter-group select option { background: #1C1B19; }
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,.11);
+}
+
+.filter-clear { min-width: auto; flex: 0 0 auto; }
+
+/* ---- Tabla ---- */
+.reservas-table-wrap {
+  background: var(--ink-3);
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.table-loading,
+.table-empty {
+  padding: 3rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.reservas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+.reservas-table thead {
+  background: var(--ink-4);
+  border-bottom: 1px solid rgba(201,168,76,.1);
+}
+
+.reservas-table th {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: .75rem;
+  letter-spacing: .12em;
+  color: var(--gold);
+  padding: .9rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.reservas-table td {
+  padding: .85rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  vertical-align: middle;
+  color: var(--cream-dim);
+}
+
+.reservas-table tr:last-child td { border-bottom: none; }
+
+.reservas-table tr {
+  transition: background .15s;
+}
+
+.reservas-table tr:hover td {
+  background: rgba(201,168,76,.03);
+}
+
+.row-cancelada td { opacity: .5; }
+
+/* Celdas específicas */
+.cell-fecha .fecha-recibida {
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+.cell-turno {
+  white-space: nowrap;
+}
+
+.cell-turno strong {
+  display: block;
+  color: var(--cream);
+  font-weight: 600;
+}
+
+.cell-turno span {
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+.cell-nombre { color: var(--cream); font-weight: 500; }
+
+.tel-link {
+  color: var(--gold-light);
+  text-decoration: none;
+  transition: color .2s;
+}
+.tel-link:hover { color: var(--gold); text-decoration: underline; }
+
+.cell-msg { max-width: 200px; }
+.cell-msg .cell-empty { color: var(--muted); opacity: .5; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  padding: .2rem .65rem;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+
+.badge-pendiente  { background: rgba(251,191,36,.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,.25); }
+.badge-confirmada { background: rgba(74,222,128,.1);   color: #4ade80; border: 1px solid rgba(74,222,128,.22); }
+.badge-cancelada  { background: rgba(248,113,113,.08); color: #f87171; border: 1px solid rgba(248,113,113,.18); }
+
+/* Botones de acción */
+.cell-actions {
+  white-space: nowrap;
+  display: flex;
+  gap: .4rem;
+  align-items: center;
+}
+
+.act-btn {
+  width: 30px; height: 30px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  background: var(--ink-4);
+  cursor: pointer;
+  font-size: .85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.act-confirm { border-color: rgba(74,222,128,.2); color: #4ade80; }
+.act-confirm:hover { background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.4); }
+
+.act-cancel { border-color: rgba(251,191,36,.2); color: #fbbf24; }
+.act-cancel:hover { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.35); }
+
+.act-delete { border-color: rgba(248,113,113,.2); color: #f87171; }
+.act-delete:hover { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.35); }
+
+.act-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .admin-main { padding: 1rem; gap: 1.25rem; }
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+  .admin-filters { gap: .75rem; }
+  .filter-group { min-width: calc(50% - .5rem); }
+
+  .reservas-table { font-size: .78rem; }
+  .reservas-table th,
+  .reservas-table td { padding: .65rem .6rem; }
+
+  /* Ocultar columna "Recibida" en mobile */
+  .reservas-table th:first-child,
+  .reservas-table td:first-child { display: none; }
+
+  .cell-msg { display: none; }
+  th:nth-child(6) { display: none; }
+}
+
+@media (max-width: 480px) {
+  .admin-stats { grid-template-columns: 1fr 1fr; }
+  .filter-group { min-width: 100%; }
+  .login-box { padding: 2rem 1.5rem; }
+}
