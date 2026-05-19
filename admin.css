@@ -264,7 +264,7 @@
   text-decoration: none;
   transition: color .2s;
 }
-.tel-link:hover { color: var(--gold); text-decoration: underline; }
+.tel-link:hover { color: var(--gold); text-decoration: underline; cursor: pointer; }
 
 .cell-msg { max-width: 200px; }
 .cell-msg .cell-empty { color: var(--muted); opacity: .5; }

@@ -6,3 +6,9 @@ dist/
 .claude/
 
 .vercel
+
+# Bot de WhatsApp
+bot/node_modules/
+bot/auth_info_baileys/
+bot/auth_info_baileys.bak*/
+bot/state.json

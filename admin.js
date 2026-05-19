@@ -32,9 +32,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 async function handleLogin() {
   const email = document.getElementById('adminEmail').value.trim();
-  const pass  = document.getElementById('adminPass').value;
+  const pass = document.getElementById('adminPass').value;
   const errEl = document.getElementById('loginError');
-  const btn   = document.getElementById('loginBtn');
+  const btn = document.getElementById('loginBtn');
 
   btn.disabled = true;
   errEl.style.display = 'none';
@@ -44,7 +44,7 @@ async function handleLogin() {
   btn.disabled = false;
 
   if (error) {
-    errEl.textContent   = 'Contraseña incorrecta.';
+    errEl.textContent = 'Contraseña incorrecta.';
     errEl.style.display = 'block';
     document.getElementById('adminPass').focus();
   } else {
@@ -69,7 +69,7 @@ function showDashboard() {
   document.getElementById('filterNombre').addEventListener('input', renderTable);
   document.getElementById('clearFilters').addEventListener('click', () => {
     document.getElementById('filterEstado').value = '';
-    document.getElementById('filterFecha').value  = '';
+    document.getElementById('filterFecha').value = '';
     document.getElementById('filterNombre').value = '';
     renderTable();
   });
@@ -82,13 +82,13 @@ let allReservas = [];
 
 async function loadReservas() {
   const loading = document.getElementById('loadingRow');
-  const table   = document.getElementById('reservasTable');
-  const empty   = document.getElementById('emptyRow');
+  const table = document.getElementById('reservasTable');
+  const empty = document.getElementById('emptyRow');
 
-  loading.textContent    = 'Cargando reservas…';
-  loading.style.display  = '';
-  table.style.display    = 'none';
-  empty.style.display    = 'none';
+  loading.textContent = 'Cargando reservas…';
+  loading.style.display = '';
+  table.style.display = 'none';
+  empty.style.display = 'none';
 
   try {
     const { data, error } = await getDb()
@@ -105,29 +105,29 @@ async function loadReservas() {
     renderTable();
 
   } catch (err) {
-    loading.textContent   = 'Error: ' + (err.message || 'No se pudieron cargar las reservas.');
+    loading.textContent = 'Error: ' + (err.message || 'No se pudieron cargar las reservas.');
     loading.style.display = '';
   }
 }
 
 function updateStats() {
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('statTotal').textContent      = allReservas.length;
-  document.getElementById('statPendiente').textContent  = allReservas.filter(r => r.estado === 'pendiente').length;
+  document.getElementById('statTotal').textContent = allReservas.length;
+  document.getElementById('statPendiente').textContent = allReservas.filter(r => r.estado === 'pendiente').length;
   document.getElementById('statConfirmada').textContent = allReservas.filter(r => r.estado === 'confirmada').length;
-  document.getElementById('statHoy').textContent        = allReservas.filter(r => r.fecha === today).length;
+  document.getElementById('statHoy').textContent = allReservas.filter(r => r.fecha === today).length;
 }
 
 /* ---- Render tabla ---- */
 function renderTable() {
   const estado = document.getElementById('filterEstado').value;
-  const fecha  = document.getElementById('filterFecha').value;
-  const query  = document.getElementById('filterNombre').value.toLowerCase();
+  const fecha = document.getElementById('filterFecha').value;
+  const query = document.getElementById('filterNombre').value.toLowerCase();
 
   let rows = allReservas;
   if (estado) rows = rows.filter(r => r.estado === estado);
-  if (fecha)  rows = rows.filter(r => r.fecha === fecha);
-  if (query)  rows = rows.filter(r =>
+  if (fecha) rows = rows.filter(r => r.fecha === fecha);
+  if (query) rows = rows.filter(r =>
     r.nombre.toLowerCase().includes(query) ||
     r.telefono.toLowerCase().includes(query)
   );
@@ -165,7 +165,7 @@ function renderTable() {
       </td>
       <td class="cell-actions">
         ${r.estado !== 'confirmada' ? `<button class="act-btn act-confirm" data-id="${r.id}" title="Confirmar">✓</button>` : ''}
-        ${r.estado !== 'cancelada'  ? `<button class="act-btn act-cancel"  data-id="${r.id}" title="Cancelar">✕</button>`  : ''}
+        ${r.estado !== 'cancelada' ? `<button class="act-btn act-cancel"  data-id="${r.id}" title="Cancelar">✕</button>` : ''}
         <button class="act-btn act-delete" data-id="${r.id}" title="Eliminar">&#x1F5D1;</button>
       </td>
     </tr>
