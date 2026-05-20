@@ -42,6 +42,10 @@ Si la fila ya fue tomada por otra instancia (o el startup scan compite con Realt
 
 Vive en `confirmaciones.js`. Usada por ambos caminos. Garantiza que el texto sea idéntico independientemente del canal.
 
+### Semántica de `confirmacion_enviada`
+
+`confirmacion_enviada = true` significa **"este turno ya fue procesado para evitar duplicados"**, no "el mensaje llegó al cliente". El flag se pone en `true` antes del `sendMessage` (UPDATE atómico). Si el envío falla, el flag queda en `true` igual — el admin recibe un aviso pero no se reintenta automáticamente. Esto es una decisión deliberada: preferimos perder una confirmación ocasional antes que spamear al cliente.
+
 ## Migración SQL y configuración Supabase
 
 ```sql
@@ -166,5 +170,5 @@ await startConfirmaciones();
 | Teléfono no parseable | Notificar admin con id de reserva, continuar |
 | `sendMessage` falla (número sin WhatsApp) | Notificar admin con id y teléfono, continuar |
 | `ADMIN_JID` no configurado | `console.error`, nunca lanza |
-| Supabase Realtime desconectado | Baileys reconecta; el startup scan en el próximo reinicio cubre el gap |
+| Supabase Realtime desconectado | El cliente de Supabase JS reconecta automáticamente; el startup scan en el próximo reinicio del bot cubre cualquier evento perdido durante el gap |
 | `confirmacion_enviada` falta en reserva antigua | El UPDATE atómico simplemente no la toca |
