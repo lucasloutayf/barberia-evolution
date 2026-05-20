@@ -93,3 +93,32 @@ export async function pendingReminders(fechaIni, fechaFin) {
 export async function markReminderSent(id) {
   return updateReserva(id, { recordatorio_enviado: true });
 }
+
+// Exposes the raw client for Realtime subscriptions in confirmaciones.js.
+export function getClient() { return sb; }
+
+// Atomic claim: sets confirmacion_enviada=true only if it's currently false.
+// Returns true if this call claimed the row (safe to send), false if already claimed.
+export async function markConfirmacionEnviada(id) {
+  const { data, error } = await sb
+    .from(TABLE)
+    .update({ confirmacion_enviada: true })
+    .eq('id', id)
+    .eq('confirmacion_enviada', false)
+    .select('id');
+  if (error) throw error;
+  return (data?.length ?? 0) > 0;
+}
+
+// Returns reservas created in the last 24 hours that haven't been claimed yet.
+// Used by the startup scan in confirmaciones.js to catch events missed while the bot was down.
+export async function pendingConfirmaciones() {
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await sb
+    .from(TABLE)
+    .select('*')
+    .eq('confirmacion_enviada', false)
+    .gte('created_at', cutoff);
+  if (error) throw error;
+  return data ?? [];
+}
