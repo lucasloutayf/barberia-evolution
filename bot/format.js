@@ -43,6 +43,7 @@ export function buildConfirmacion(reserva) {
     `⏳ Dura ${formatDuracion(duracion)}`,
   ];
   if (precio != null) lines.push(`💲 Precio: $${precio.toLocaleString('es-AR')}`);
+  if (reserva.mensaje?.trim()) lines.push(`📝 ${reserva.mensaje.trim()}`);
   lines.push(``, `Cualquier cosa, avisame. ${cierre}`);
   return lines.join('\n');
 }
