@@ -32,14 +32,18 @@ if (!process.env.ADMIN_JID) {
   console.warn('[warn] ADMIN_JID no configurado: los comandos /turnos y /cancelar no van a funcionar.');
 }
 
-const { loadState }         = await import('./state.js');
-const { connectToWhatsApp } = await import('./whatsapp.js');
-const { startScheduler }    = await import('./scheduler.js');
+const { loadState }           = await import('./state.js');
+const { load: loadGuard }     = await import('./guard.js');
+const { connectToWhatsApp }   = await import('./whatsapp.js');
+const { startScheduler }      = await import('./scheduler.js');
+const { startConfirmaciones } = await import('./confirmaciones.js');
 
 try {
   await loadState();
+  await loadGuard();
   await connectToWhatsApp();
   startScheduler();
+  await startConfirmaciones();
 } catch (err) {
   console.error('[fatal]', err);
   process.exit(1);
