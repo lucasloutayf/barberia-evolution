@@ -1,4 +1,4 @@
-import { getSock } from './whatsapp.js';
+import { getSock, waitForConnected } from './whatsapp.js';
 import { normalizePhoneToJid } from './state.js';
 import { getClient, markConfirmacionEnviada, pendingConfirmaciones } from './supabase.js';
 import { buildConfirmacion } from './format.js';
@@ -53,6 +53,11 @@ export async function startConfirmaciones() {
       else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT')
         console.error(`[confirmaciones] Realtime status: ${status}`);
     });
+
+  // Esperar a que WhatsApp esté conectado antes del startup scan.
+  // connectToWhatsApp() retorna en cuanto crea el socket, pero la conexión
+  // real es asíncrona — si el scan corre antes, sendMessage falla con "Connection Closed".
+  await waitForConnected();
 
   // Startup scan: covers reservas created while the bot was down (last 24h).
   try {

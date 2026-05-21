@@ -14,12 +14,30 @@ import { Boom } from '@hapi/boom';
 import qrcode from 'qrcode-terminal';
 import pino from 'pino';
 
-import { ADMIN_JID } from './config.js';
-import { handleAdmin } from './admin.js';
 import { handleMessage, ProviderBusyError } from './agent.js';
 import { setRealJid } from './state.js';
+import * as guard from './guard.js';
+import { BUSINESS_HOURS, TZ } from './config.js';
+
+function isWithinBusinessHours() {
+  const local = new Date(new Date().toLocaleString('en-US', { timeZone: TZ }));
+  const day = local.getDay();
+  if (BUSINESS_HOURS.closedDays.includes(day)) return false;
+  const hhmm = `${String(local.getHours()).padStart(2, '0')}:${String(local.getMinutes()).padStart(2, '0')}`;
+  return hhmm >= BUSINESS_HOURS.start && hhmm <= BUSINESS_HOURS.end;
+}
+
+const CLOSED_COOLDOWN_MS = 60 * 60 * 1000; // 1 hora
+const closedNotifiedAt = new Map(); // jid -> timestamp de último aviso de cerrado
 
 let sockInstance = null;
+
+// Resolvers waiting for the first successful connection.
+let _connectedResolvers = [];
+export function waitForConnected() {
+  if (sockInstance && _connectedResolvers === null) return Promise.resolve();
+  return new Promise(resolve => { _connectedResolvers.push(resolve); });
+}
 
 // Cola por JID: si un usuario manda 3 mensajes seguidos, los procesamos uno a
 // uno (no en paralelo). Sin esto, varios handleMessage corren a la vez para
@@ -102,15 +120,24 @@ export async function connectToWhatsApp() {
             ? lastDisconnect.error.output?.statusCode
             : lastDisconnect.error?.output?.statusCode)
         : null;
-      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+      const isReplaced = statusCode === DisconnectReason.connectionReplaced || statusCode === 440;
+      const isLoggedOut = statusCode === DisconnectReason.loggedOut;
+      const shouldReconnect = !isLoggedOut && !isReplaced;
       console.log(`[whatsapp] conexión cerrada (code=${statusCode}). Reconectar: ${shouldReconnect}`);
-      if (shouldReconnect) {
-        setTimeout(() => { connectToWhatsApp().catch(console.error); }, 2000);
-      } else {
+      if (isReplaced) {
+        console.log('[whatsapp] CONFLICTO: otra sesión ya está activa con este número.');
+        console.log('[whatsapp] Cerrá WhatsApp Web en el navegador y cualquier otra instancia del bot, luego reiniciá.');
+      } else if (isLoggedOut) {
         console.log('[whatsapp] sesión cerrada. Borrá auth_info_baileys/ y reiniciá para vincular un nuevo número.');
+      } else if (shouldReconnect) {
+        setTimeout(() => { connectToWhatsApp().catch(console.error); }, 2000);
       }
     } else if (connection === 'open') {
       console.log('[whatsapp] conexión establecida.');
+      if (Array.isArray(_connectedResolvers)) {
+        _connectedResolvers.forEach(r => r());
+        _connectedResolvers = null; // signal: already connected
+      }
     }
   });
 
@@ -140,25 +167,41 @@ export async function connectToWhatsApp() {
         setRealJid(lidJid, from);
       }
 
-      const text = extractText(m).trim();
-      if (!text) continue;
+      const rawText = extractText(m).trim();
+      if (!rawText) continue;
+
+      const { allowed, reason, firstOffense, text } = guard.check(from, rawText);
+      if (!allowed) {
+        if (firstOffense && reason !== 'blocked') {
+          const warnMsg = reason === 'rate_limit'
+            ? 'Estás mandando muchos mensajes seguidos. Esperá un momento antes de escribir de nuevo.'
+            : 'Hay varios mensajes tuyos en espera. Esperá a que los procese antes de mandar más.';
+          await sock.sendMessage(from, { text: warnMsg }).catch(() => {});
+        }
+        continue;
+      }
 
       // Serializamos por JID: si llegan varios mensajes del mismo cliente,
       // se procesan uno tras otro (no en paralelo). NO esperamos esta promesa
       // acá para no bloquear la cola global de Baileys con un único cliente
       // lento.
+      if (text.startsWith('/')) continue;
+
+      /* if (!isWithinBusinessHours()) {
+        const lastNotified = closedNotifiedAt.get(from) || 0;
+        if (Date.now() - lastNotified > CLOSED_COOLDOWN_MS) {
+          closedNotifiedAt.set(from, Date.now());
+          await sock.sendMessage(from, {
+            text: 'El salón está cerrado en este momento 🌙\nNuestro horario es lunes a sábado de 9:00 a 19:30 hs.\n¡Escribinos en horario y te atendemos enseguida!',
+          }).catch(() => {});
+        }
+        guard.queueDecrement(from);
+        continue;
+      }  */
+
       enqueueFor(from, async () => {
         try {
-          // Rama admin: comandos que empiezan con "/"
-          if (ADMIN_JID && from === ADMIN_JID) {
-            const { handled, reply } = await handleAdmin(text);
-            if (handled) {
-              await sock.sendMessage(from, { text: reply });
-              return;
-            }
-          }
-
-          // Rama cliente: lenguaje natural via LLM (Cerebras / Llama)
+          // Rama cliente: lenguaje natural via LLM
           await sock.sendPresenceUpdate('composing', from).catch(() => {});
           const reply = await handleMessage(from, text);
           await sock.sendMessage(from, { text: reply });
@@ -170,11 +213,13 @@ export async function connectToWhatsApp() {
           if (err?.response) console.error('  response:', JSON.stringify(err.response).slice(0, 500));
 
           const userMsg = err instanceof ProviderBusyError
-            ? 'Estoy con mucha demanda en este momento 🙏. ¿Podés volver a escribirme en un minuto?'
-            : `Disculpá, tuve un problema técnico:\n_${(err?.message || 'desconocido').slice(0, 200)}_`;
+            ? 'Estoy con mucha demanda en este momento, disculpá. ¿Podés volver a escribirme en un minuto?'
+            : 'Uy, algo falló de nuestro lado. ¿Podés intentar de vuelta en un ratito?';
           try {
             await sock.sendMessage(from, { text: userMsg });
           } catch {}
+        } finally {
+          guard.queueDecrement(from);
         }
       });
     }
