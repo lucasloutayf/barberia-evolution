@@ -65,6 +65,10 @@ const db = window.supabase.createClient(
 
   // --- Abrir / cerrar ---
   function openModal() {
+    if (widgetId !== null && window.turnstile) {
+      window.turnstile.remove(widgetId);
+      widgetId = null;
+    }
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
     formWrap.hidden = false;
@@ -73,23 +77,25 @@ const db = window.supabase.createClient(
     overlay.querySelector('.modal-box').scrollTop = 0;
 
     turnstileToken = null;
-    widgetId = window.turnstile.render('#turnstileContainer', {
-      sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
-      callback: (token) => {
-        turnstileToken = token;
-        errorMsg.classList.remove('show');
-      },
-      'expired-callback': () => {
-        turnstileToken = null;
-        errorMsg.textContent = 'La verificación expiró, volvé a completarla.';
-        errorMsg.classList.add('show');
-      },
-      'error-callback': () => {
-        turnstileToken = null;
-        errorMsg.textContent = 'Error en la verificación. Recargá la página e intentá de nuevo.';
-        errorMsg.classList.add('show');
-      },
-    });
+    if (window.turnstile) {
+      widgetId = window.turnstile.render('#turnstileContainer', {
+        sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+        callback: (token) => {
+          turnstileToken = token;
+          errorMsg.classList.remove('show');
+        },
+        'expired-callback': () => {
+          turnstileToken = null;
+          errorMsg.textContent = 'La verificación expiró, volvé a completarla.';
+          errorMsg.classList.add('show');
+        },
+        'error-callback': () => {
+          turnstileToken = null;
+          errorMsg.textContent = 'Error en la verificación. Recargá la página e intentá de nuevo.';
+          errorMsg.classList.add('show');
+        },
+      });
+    }
   }
 
   function closeModal() {
