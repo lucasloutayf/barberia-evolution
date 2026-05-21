@@ -53,12 +53,14 @@ Static site with no framework or bundler transformations — Vite is used only a
 
 ## Bot de WhatsApp (`bot/`)
 
-Independent Node.js subproject — **not** touched by Vite. Reads/writes the same `public.reservas` table so reservations created by the bot show up in the existing admin panel.
+Independent Node.js subproject — **not** touched by Vite. Requires Node 20+. Reads/writes the same `public.reservas` table so reservations created by the bot show up in the existing admin panel.
 
 ```bash
 cd bot
 npm install
-npm run dev      # arranca el bot con --watch (escanear QR en consola la primera vez)
+npm run dev                       # arranca el bot con --watch (escanear QR en consola la primera vez)
+node --test test-guard.js         # corre las 18 pruebas unitarias de guard.js
+node test-api.js                  # prueba la conexión al proveedor LLM directamente (sin bot)
 ```
 
 **Stack:** Baileys (WhatsApp) + Cerebras Qwen3 235B (MoE, ~22B activos) vía SDK de OpenAI (NLU con function calling) + Supabase service-role client + node-cron (recordatorios 24h).
@@ -70,6 +72,7 @@ El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona
 - `AI_BASE_URL` — endpoint OpenAI-compatible (default: `https://api.cerebras.ai/v1`).
 - `AI_API_KEY` — API key del proveedor (Cerebras: https://cloud.cerebras.ai).
 - `AI_MODEL` — id del modelo en el proveedor (default: `qwen-3-235b-a22b-instruct-2507`).
+- `AI_MODEL_FALLBACK` — modelo alternativo si el primario devuelve 429/503 (ej: `gpt-oss-120b`).
 - `ADMIN_JID` — JID del WhatsApp del admin (`<numero>@s.whatsapp.net`).
 
 **Migración requerida** (correr una vez en SQL Editor de Supabase):
@@ -85,3 +88,23 @@ CREATE INDEX IF NOT EXISTS reservas_fecha_estado_idx ON public.reservas (fecha, 
 **Reglas compartidas con el frontend:** horario Lun-Sáb 09:00–19:30, slots cada 30 min, ventana de reserva tomorrow → +45 días, Domingos cerrado. Si cambian acá, también editar `BUSINESS_HOURS` en [bot/config.js](bot/config.js) y los hard-codes en [main.js](main.js).
 
 **A diferencia del formulario web**, el bot SÍ chequea colisiones y bloquea slots consecutivos según `duracion_min` del servicio. Las reservas viejas sin `duracion_min` se tratan como 30 min.
+
+**Módulos del bot:**
+- `index.js` — entry point; valida env vars, llama `guard.load()`, y hace lazy-load del resto tras cargar dotenv.
+- `whatsapp.js` — integración Baileys 7.x; pasa mensajes por `guard.check()` antes de encolarlos; llama `guard.queueDecrement()` en el `finally`. Mantiene un `inflight` Map para serializar los mensajes por JID (evita race conditions en el estado).
+- `guard.js` — protección contra spam: rate limiting de doble ventana (3 msgs/10 s burst + 8 msgs/60 s), cap de cola (4 msgs pendientes por JID), sanitización (trunca a 1000 chars), y blocklist persistida en `blocklist.json`. API: `load()`, `check()`, `blockJid()`, `unblockJid()`, `isBlocked()`, `listBlocked()`, `queueDecrement()`, `sanitizeText()`.
+- `agent.js` — loop de function calling contra el proveedor OpenAI-compatible; construye el system prompt dinámicamente con el catálogo, datos del cliente y reglas de negocio. Exporta `ProviderBusyError` para manejo de 429/503.
+- `tools.js` — implementaciones de las 4 herramientas del LLM: `listar_servicios`, `consultar_disponibilidad`, `crear_reserva`, `ver_mis_reservas`.
+- `slots.js` — genera slots disponibles y detecta colisiones considerando `duracion_min`.
+- `state.js` — estado de conversación en memoria por JID (`nombre`, `telefono`, `history`). Se persiste en `state.json`; incluye lógica de migración para formatos anteriores (Gemini, JIDs `@lid`). Exporta `normalizePhoneToJid()` para convertir número de teléfono humano a JID de WhatsApp.
+- `config.js` — catálogo de servicios, horarios, `BOOKING_WINDOW_DAYS`. Exporta `findServiceByNombre()` (exact match) y `findServiceFuzzy()` (fuzzy match). Los nombres de servicio DEBEN coincidir con los `<option>` del `<select>` en `index.html`.
+- `scheduler.js` — cron cada 15 min para recordatorios 24 h antes de la reserva.
+- `admin.js` — comandos WhatsApp exclusivos del admin (`/turnos`, `/cancelar <id>`, `/bloquear <número>`, `/desbloquear <número>`, `/bloqueados`, `/help`); se procesan antes de llegar al LLM.
+- `supabase.js` — cliente Supabase con service-role key; todas las queries del bot pasan por aquí.
+
+**Archivos de runtime (gitignoreados):**
+- `state.json` — snapshot de conversaciones por JID
+- `blocklist.json` — JIDs bloqueados con timestamp; escrito con debounce de 2 s por `guard.js`
+- `auth_info_baileys/` — credenciales de sesión de Baileys
+
+**JID aliasing (Baileys 7.x):** Las cuentas nuevas de WhatsApp usan JIDs `@lid` en lugar de `@s.whatsapp.net`. `whatsapp.js` normaliza estos a JIDs de teléfono cuando están disponibles. `state.js` limpia en el arranque los JIDs `@lid` inválidos heredados de versiones anteriores.
