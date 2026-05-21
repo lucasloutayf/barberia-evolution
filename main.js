@@ -21,6 +21,9 @@ const db = window.supabase.createClient(
   const fechaInput = document.getElementById('rf-fecha');
   const horaSelect = document.getElementById('rf-hora');
 
+  let turnstileToken = null;
+  let widgetId = null;
+
   // --- Generar slots de horario ---
   const slots = [];
   for (let h = 9; h < 20; h++) {
@@ -64,16 +67,39 @@ const db = window.supabase.createClient(
   function openModal() {
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
-    // Resetear a form si estaba en success
     formWrap.hidden = false;
     successDiv.hidden = true;
     errorMsg.classList.remove('show');
     overlay.querySelector('.modal-box').scrollTop = 0;
+
+    turnstileToken = null;
+    widgetId = window.turnstile.render('#turnstileContainer', {
+      sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+      callback: (token) => {
+        turnstileToken = token;
+        errorMsg.classList.remove('show');
+      },
+      'expired-callback': () => {
+        turnstileToken = null;
+        errorMsg.textContent = 'La verificación expiró, volvé a completarla.';
+        errorMsg.classList.add('show');
+      },
+      'error-callback': () => {
+        turnstileToken = null;
+        errorMsg.textContent = 'Error en la verificación. Recargá la página e intentá de nuevo.';
+        errorMsg.classList.add('show');
+      },
+    });
   }
 
   function closeModal() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
+    if (widgetId !== null) {
+      window.turnstile.remove(widgetId);
+      widgetId = null;
+      turnstileToken = null;
+    }
   }
 
   // Disparadores de apertura
