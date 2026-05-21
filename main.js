@@ -1,12 +1,4 @@
 /* =====================
-   SUPABASE
-   ===================== */
-const db = window.supabase.createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
-
-/* =====================
    MODAL RESERVA
    ===================== */
 (function () {
@@ -129,7 +121,7 @@ const db = window.supabase.createClient(
     e.preventDefault();
     errorMsg.classList.remove('show');
 
-    // Validación básica
+    // Validar campos requeridos
     const fields = form.querySelectorAll('[required]');
     let valid = true;
     fields.forEach(f => {
@@ -146,32 +138,60 @@ const db = window.supabase.createClient(
       return;
     }
 
+    if (!turnstileToken) {
+      errorMsg.textContent = 'Completá la verificación anti-bot antes de confirmar.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando…';
 
     const payload = {
-      nombre:   form.nombre.value.trim(),
-      telefono: form.telefono.value.trim(),
-      servicio: form.servicio.value,
-      fecha:    form.fecha.value,
-      hora:     form.hora.value,
-      mensaje:  form.mensaje.value.trim() || null,
+      nombre:         form.nombre.value.trim(),
+      telefono:       form.telefono.value.trim(),
+      servicio:       form.servicio.value,
+      fecha:          form.fecha.value,
+      hora:           form.hora.value,
+      mensaje:        form.mensaje.value.trim() || null,
+      turnstileToken,
     };
 
-    const { error } = await db.from('reservas').insert(payload);
+    // Reset widget immediately — token is single-use
+    if (widgetId !== null && window.turnstile) {
+      window.turnstile.reset(widgetId);
+    }
+    turnstileToken = null;
 
-    if (error) {
-      errorMsg.textContent = 'Hubo un error al enviar tu reserva. Intentá nuevamente o llamanos.';
+    let res, data;
+    try {
+      res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-reserva`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      data = await res.json();
+    } catch {
+      errorMsg.textContent = 'Sin conexión. Verificá tu internet e intentá de nuevo.';
       errorMsg.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Confirmar reserva';
       return;
     }
 
-    // Éxito
-    form.reset();
     submitBtn.disabled = false;
     submitBtn.textContent = 'Confirmar reserva';
+
+    if (!res.ok) {
+      errorMsg.textContent = data?.error ?? 'Error al enviar la reserva. Intentá de nuevo o llamanos.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    form.reset();
     formWrap.hidden = true;
     successDiv.hidden = false;
   });
