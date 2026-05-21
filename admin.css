@@ -346,3 +346,125 @@
   .filter-group { min-width: 100%; }
   .login-box { padding: 2rem 1.5rem; }
 }
+
+/* ---- Calendario ---- */
+.cal-section {
+  background: var(--ink-3);
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: var(--r-md);
+  padding: 1.25rem 1.5rem;
+}
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.cal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: .1em;
+  color: var(--gold);
+}
+
+.cal-nav-btn {
+  background: var(--ink-4);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: var(--r-sm);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: .9rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s, color .2s;
+}
+
+.cal-nav-btn:hover {
+  border-color: rgba(201,168,76,.35);
+  color: var(--gold);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: .25rem;
+  text-align: center;
+}
+
+.cal-day-name {
+  font-size: .68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-muted);
+  padding: .3rem 0 .5rem;
+}
+
+.cal-day {
+  border-radius: var(--r-sm);
+  padding: .45rem .25rem;
+  font-size: .83rem;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  color: var(--text);
+}
+
+.cal-day--empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+.cal-day--muted {
+  color: var(--text-muted);
+}
+
+.cal-day:not(.cal-day--sunday):not(.cal-day--empty):hover {
+  background: rgba(201,168,76,.1);
+  color: var(--text);
+}
+
+.cal-day--today {
+  outline: 1px solid rgba(201,168,76,.35);
+  outline-offset: -1px;
+}
+
+.cal-day--selected {
+  background: var(--gold) !important;
+  color: var(--ink) !important;
+  font-weight: 700;
+  outline: none;
+}
+
+.cal-day-count {
+  display: block;
+  font-size: .68rem;
+  color: var(--gold);
+  line-height: 1;
+  min-height: .85rem;
+}
+
+.cal-day--muted .cal-day-count {
+  visibility: hidden;
+}
+
+.cal-day--selected .cal-day-count {
+  color: var(--ink);
+}
+
+.cal-day--sunday {
+  opacity: .3;
+  cursor: default;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .cal-section { padding: 1rem; }
+  .cal-day { padding: .35rem .15rem; font-size: .75rem; }
+  .cal-day-count { font-size: .6rem; }
+}

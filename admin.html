@@ -79,6 +79,16 @@
         </div>
       </div>
 
+      <!-- Calendario -->
+      <div class="cal-section" id="calSection">
+        <div class="cal-header">
+          <button type="button" class="cal-nav-btn" id="calPrev">&#8592;</button>
+          <span class="cal-title" id="calTitle"></span>
+          <button type="button" class="cal-nav-btn" id="calNext">&#8594;</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
       <!-- Filtros -->
       <div class="admin-filters">
         <div class="filter-group">
@@ -89,10 +99,6 @@
             <option value="confirmada">Confirmada</option>
             <option value="cancelada">Cancelada</option>
           </select>
-        </div>
-        <div class="filter-group">
-          <label>Fecha del turno</label>
-          <input type="date" id="filterFecha">
         </div>
         <div class="filter-group">
           <label>Buscar cliente</label>

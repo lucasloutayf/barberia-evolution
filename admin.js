@@ -56,29 +56,51 @@ function showDashboard() {
   hide('loginScreen');
   show('dashboard');
 
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await getDb().auth.signOut();
-    show('loginScreen');
-    hide('dashboard');
-    document.getElementById('adminPass').value = '';
-  });
+  if (!dashboardBound) {
+    dashboardBound = true;
 
-  document.getElementById('refreshBtn').addEventListener('click', loadReservas);
-  document.getElementById('filterEstado').addEventListener('change', renderTable);
-  document.getElementById('filterFecha').addEventListener('input', renderTable);
-  document.getElementById('filterNombre').addEventListener('input', renderTable);
-  document.getElementById('clearFilters').addEventListener('click', () => {
-    document.getElementById('filterEstado').value = '';
-    document.getElementById('filterFecha').value = '';
-    document.getElementById('filterNombre').value = '';
-    renderTable();
-  });
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await getDb().auth.signOut();
+      show('loginScreen');
+      hide('dashboard');
+      document.getElementById('adminPass').value = '';
+    });
 
+    document.getElementById('refreshBtn').addEventListener('click', loadReservas);
+
+    document.getElementById('calPrev').addEventListener('click', () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar(calYear, calMonth);
+    });
+    document.getElementById('calNext').addEventListener('click', () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar(calYear, calMonth);
+    });
+    document.getElementById('filterEstado').addEventListener('change', renderTable);
+    document.getElementById('filterNombre').addEventListener('input', renderTable);
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      document.getElementById('filterEstado').value = '';
+      document.getElementById('filterNombre').value = '';
+      selectedDate = null;
+      renderCalendar(calYear, calMonth);
+      renderTable();
+    });
+  }
+
+  calYear = new Date().getFullYear();
+  calMonth = new Date().getMonth();
   loadReservas();
 }
 
 /* ---- Carga de datos ---- */
 let allReservas = [];
+let selectedDate = null;
+const _now = new Date();
+let calYear = _now.getFullYear();
+let calMonth = _now.getMonth();
+let dashboardBound = false;
 
 async function loadReservas() {
   const loading = document.getElementById('loadingRow');
@@ -102,11 +124,13 @@ async function loadReservas() {
 
     allReservas = data || [];
     updateStats();
+    renderCalendar(calYear, calMonth);
     renderTable();
 
   } catch (err) {
     loading.textContent = 'Error: ' + (err.message || 'No se pudieron cargar las reservas.');
     loading.style.display = '';
+    renderCalendar(calYear, calMonth);
   }
 }
 
@@ -121,7 +145,7 @@ function updateStats() {
 /* ---- Render tabla ---- */
 function renderTable() {
   const estado = document.getElementById('filterEstado').value;
-  const fecha = document.getElementById('filterFecha').value;
+  const fecha = selectedDate;
   const query = document.getElementById('filterNombre').value.toLowerCase();
 
   let rows = allReservas;
@@ -212,6 +236,64 @@ async function deleteReserva(id, btn) {
   } catch {
     btn.disabled = false;
   }
+}
+
+/* ---- Calendario ---- */
+const MONTH_NAMES = [
+  'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+];
+
+function renderCalendar(year, month) {
+  calYear = year;
+  calMonth = month;
+
+  document.getElementById('calTitle').textContent = `${MONTH_NAMES[month]} ${year}`;
+
+  const grid = document.getElementById('calGrid');
+  const today = new Date().toISOString().split('T')[0];
+
+  const dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  let html = dayNames.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+  // getDay() returns 0=Sun,1=Mon,...,6=Sat — convert to Mon-based offset (0=Mon,...,6=Sun)
+  const firstDow = new Date(year, month, 1).getDay();
+  const startOffset = (firstDow === 0) ? 6 : firstDow - 1;
+  for (let i = 0; i < startOffset; i++) {
+    html += `<div class="cal-day cal-day--empty"></div>`;
+  }
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const isSunday = new Date(year, month, d).getDay() === 0;
+    const isToday   = iso === today;
+    const isSelected = iso === selectedDate;
+    // Only count confirmed — by design; pending reservations don't display on calendar
+    const count = allReservas.filter(r => r.fecha === iso && r.estado === 'confirmada').length;
+
+    const classes = [
+      'cal-day',
+      isSunday   ? 'cal-day--sunday'   : '',
+      isToday    ? 'cal-day--today'    : '',
+      isSelected ? 'cal-day--selected' : '',
+      (!isSunday && count === 0) ? 'cal-day--muted' : '',
+      count > 0  ? 'cal-day--has-confirmed' : '',
+    ].filter(Boolean).join(' ');
+
+    html += `<div class="${classes}" data-date="${iso}">${d}<span class="cal-day-count">${count > 0 ? count : ''}</span></div>`;
+  }
+
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.cal-day:not(.cal-day--sunday):not(.cal-day--empty)').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const date = cell.dataset.date;
+      selectedDate = (selectedDate === date) ? null : date;
+      renderCalendar(calYear, calMonth);
+      renderTable();
+    });
+  });
 }
 
 /* ---- Helpers ---- */
