@@ -178,6 +178,15 @@ export function resetHistory(jid) {
   scheduleSave();
 }
 
+// Converts a human phone string to a WhatsApp JID.
+// input: "351 304 2203", "+5493513042203", etc.
+// returns: "5493513042203@s.whatsapp.net" or null if the input isn't a valid phone.
+// Distinct from cleanPhone() which returns only digits.
+export function normalizePhoneToJid(input) {
+  const phone = cleanPhone(input);
+  return phone ? `${phone}@s.whatsapp.net` : null;
+}
+
 // Cierre limpio del proceso → flush a disco.
 process.on('SIGINT', async () => {
   await saveStateNow();
