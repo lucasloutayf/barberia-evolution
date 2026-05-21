@@ -10,6 +10,7 @@ import {
   listActivasByFecha, insertReserva, updateReserva, cancelReserva,
   findById, findFuturasByTelefono,
 } from './supabase.js';
+import { buildConfirmacion } from './format.js';
 
 // ---------- Implementaciones ----------
 
@@ -76,6 +77,7 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
     duracion_min: svc.duracion_min,
     estado: 'pendiente',
     recordatorio_enviado: false,
+    confirmacion_enviada: true,
   });
 
   return {
@@ -89,6 +91,7 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
       duracion_min: reserva.duracion_min,
       precio_ars: svc.precio,
       estado: reserva.estado,
+      mensaje_confirmacion: buildConfirmacion(reserva),
     },
   };
 }
