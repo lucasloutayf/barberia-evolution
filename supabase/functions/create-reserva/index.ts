@@ -53,6 +53,7 @@ Deno.serve(async (req: Request) => {
   const ip = getClientIp(req)
 
   if (ip) {
+    // Non-atomic check-then-insert: concurrent bursts may slip through by up to one extra request per in-flight connection.
     const since = new Date(Date.now() - 15 * 60 * 1000).toISOString()
     const { count } = await db
       .from('_ip_attempts')
