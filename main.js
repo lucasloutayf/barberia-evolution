@@ -173,13 +173,18 @@
           body: JSON.stringify(payload),
         }
       );
-      data = await res.json();
     } catch {
       errorMsg.textContent = 'Sin conexión. Verificá tu internet e intentá de nuevo.';
       errorMsg.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Confirmar reserva';
       return;
+    }
+
+    try {
+      data = await res.json();
+    } catch {
+      data = {};
     }
 
     submitBtn.disabled = false;
