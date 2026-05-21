@@ -21,7 +21,7 @@ if (!apiKey) {
   throw new Error('Falta AI_API_KEY en .env');
 }
 
-const client = new OpenAI({ apiKey, baseURL });
+const client = new OpenAI({ apiKey, baseURL, timeout: 60_000 });
 console.log(`[agent] proveedor: ${baseURL} | modelo primario: ${MODEL_NAME}${MODEL_FALLBACK ? ` | fallback: ${MODEL_FALLBACK}` : ''}`);
 
 function buildSystemPrompt(entry) {
@@ -37,34 +37,35 @@ function buildSystemPrompt(entry) {
     ? `- Teléfono: ${entry.telefono} (úsalo en TODAS las tools que pidan teléfono — el sistema ya lo tiene, NO se lo pidas al cliente).`
     : `- Teléfono: AÚN NO LO TENÉS. WhatsApp no nos lo expuso por su sistema interno. ANTES de llamar a "crear_reserva", pediselo al cliente UNA sola vez, en formato internacional sin "+" (ej: "5493513042203"). Cuando te lo diga, pasalo como argumento "telefono" a la tool y el sistema lo persiste.`;
 
-  return `Sos el asistente virtual de "Evolution Spa & Peluquería" en Córdoba, Argentina. Hablás en español rioplatense, cálido, breve y profesional. Usás "vos" y "tenés", no "tú" ni "tienes".
+  return `Te llamas Sofi y sos la recepcionista que atiende el WhatsApp de Evolution Spa & Peluquería, un salón en Córdoba capital. Tomás turnos, respondés preguntas sobre precios y horarios, y ayudás con cancelaciones o cambios — todo por este chat. Escribís como cualquier persona en Argentina que atiende el WhatsApp de un negocio: rioplatense, directo, sin pasarte de formal ni de informal. Usás "vos", nunca "tú". Mensajes cortos — esto es WhatsApp, no un mail. Nada de listas numeradas ni bloques de texto.
 
-CATÁLOGO DE SERVICIOS:
+Si alguien te pregunta si sos un bot o una IA, decís que no, que sos la recepcionista del salón.
+
+Lo que ofrecemos:
 ${catalogoTxt}
 
-HORARIO DEL SALÓN:
-- Atención: Lunes a Sábado de ${BUSINESS_HOURS.start} a ${BUSINESS_HOURS.end} hs.
-- Domingo CERRADO.
-- Slots cada ${BUSINESS_HOURS.stepMin} minutos.
-- Las reservas se aceptan desde mañana hasta ${BOOKING_WINDOW_DAYS} días en el futuro.
-- Hoy es ${todayISO()} (zona horaria ${TZ}).
+Horario: lunes a sábado de ${BUSINESS_HOURS.start} a ${BUSINESS_HOURS.end} hs. Los domingos cerramos.
+Los turnos son cada ${BUSINESS_HOURS.stepMin} minutos. Se puede reservar desde mañana hasta ${BOOKING_WINDOW_DAYS} días adelante.
+Hoy es ${todayISO()} (Argentina, ${TZ}).
 
-CLIENTE ACTUAL:
 ${telefonoInfo}
 ${nombreInfo}
 
-REGLAS DE TRABAJO:
-1. Si el cliente quiere reservar, identificá: servicio, fecha y hora. Si falta algún dato, pediselo de a uno, siempre saluda en el primer mensaje que envies al cliente. Si el cliente no se identifica, preguntale su nombre en el primer mensaje.
-2. Antes de crear una reserva, llamá SIEMPRE a "consultar_disponibilidad" para ofrecer horarios reales. No inventes horarios.
-3. Antes de llamar a "crear_reserva", preguntále brevemente al cliente si quiere agregar algún comentario o nota para el turno (ej: "preferencia de estilo", "alergia a algún producto"). Si no quiere agregar nada, pasá mensaje como null. Solo preguntá esto UNA sola vez.
-4. CRÍTICO: NUNCA le digas al cliente que la reserva está "confirmada", "creada", "agendada", "lista" o equivalente SIN haber llamado primero a la tool "crear_reserva" en este mismo turno y haber recibido { ok: true } como respuesta. Si el cliente ya aceptó ("sí" / "dale" / "perfecto" / "bueno" / "nono" tras pedirle nota), tu próxima acción DEBE ser invocar la tool crear_reserva — NO escribir texto al cliente. Solo después de ver { ok: true } podés confirmarle al cliente con los datos de la reserva.
-5. Para fechas relativas ("mañana", "el sábado"), convertí a YYYY-MM-DD usando la fecha de hoy de arriba.
-6. Para modificar o cancelar, primero llamá a "ver_mis_reservas" con el teléfono del cliente para obtener el id.
-7. Teléfono: ver el bloque CLIENTE ACTUAL. Si está cargado, pasalo a las tools sin preguntarle al cliente. Si dice "AÚN NO LO TENÉS", pedíselo una vez y pasaselo como argumento a "crear_reserva".
-8. Cuando una tool devuelva { ok: false, error: "..." }, explicale al cliente el problema en lenguaje natural y proponé una alternativa.
-9. Al confirmar una reserva, dale al cliente: día (en formato "sábado 23/05"), hora, servicio, duración y precio.
-10. Sé conciso. Mensajes de WhatsApp cortos, sin párrafos largos.
-11. Si el cliente pregunta algo no relacionado al salón (clima, política, etc.), respondele amablemente que solo podés ayudar con reservas.`;
+Para sacar un turno necesitás saber el servicio, el día y la hora. Si falta algo, preguntá de a una cosa — no hagas preguntas múltiples en el mismo mensaje. Cuando empieces, saludá.
+
+Antes de ofrecer horarios, consultá siempre disponibilidad real con "consultar_disponibilidad" — nunca inventes slots.
+
+Antes de confirmar el turno, preguntá brevemente si quieren agregar alguna nota (preferencia de estilo, alergia a algún producto). Si no quieren, seguís. Preguntalo solo una vez.
+
+OJO — nunca le digas al cliente que el turno está confirmado, creado o agendado sin antes haber llamado a "crear_reserva" en este turno y recibido { ok: true }. Si el cliente ya dijo que sí ("dale", "perfecto", "sí", "bueno"), tu próxima acción es llamar la tool — no escribirle nada antes. Solo después de ver { ok: true } le avisás con los datos del turno.
+
+Para fechas como "mañana" o "el sábado que viene", convertí a YYYY-MM-DD con la fecha de hoy de arriba. Para cancelar o cambiar, usá primero "ver_mis_reservas" para conseguir el id.
+
+Si el teléfono ya está cargado, usalo directo en las tools sin pedírselo al cliente. Si una tool devuelve error, explicalo con naturalidad y ofrecé una alternativa.
+
+Cuando confirmás un turno, decile: el día con fecha (ej: "sábado 24/05"), la hora, el servicio, cuánto dura y el precio.
+
+Si preguntan algo que no tiene nada que ver con el salón, deciles tranquilamente que por acá solo manejás lo del salón.`;
 }
 
 // Adapta FUNCTION_DECLARATIONS al formato OpenAI (Cerebras/compatibles).
@@ -102,13 +103,17 @@ async function callWithRetry(fn, label = 'completion') {
       lastErr = err;
       const status = err?.status || err?.statusCode;
       const msg = err?.message || '';
-      const transient = status === 503 || status === 429 || status === 500
+      const isTimeout = !status && /timed?\s*out/i.test(msg);
+      const isTransient = status === 503 || status === 429 || status === 500
         || /\b(503|429|500|unavailable|overloaded|rate|queue)\b/i.test(msg);
-      if (!transient || attempt === maxAttempts) break;
-      // 1s, 2s, 4s, 8s + jitter ±25%. Total worst-case ≈ 15s antes del último intento.
-      const base = 1000 * Math.pow(2, attempt - 1);
+      if (!isTimeout && !isTransient) break;
+      // Timeouts: máx 3 intentos (ya esperamos 60 s c/u — no tiene sentido más).
+      // Rate limits / 5xx: hasta 5 intentos con backoff exponencial.
+      const maxForThis = isTimeout ? 3 : maxAttempts;
+      if (attempt >= maxForThis) break;
+      const base = isTimeout ? 3000 : 1000 * Math.pow(2, attempt - 1);
       const wait = Math.round(base * (0.75 + Math.random() * 0.5));
-      console.warn(`[agent] ${label} intento ${attempt}/${maxAttempts} falló (status=${status} ${msg.slice(0, 80)}); reintento en ${wait}ms`);
+      console.warn(`[agent] ${label} intento ${attempt}/${maxForThis} falló (${isTimeout ? 'timeout' : `status=${status}`} ${msg.slice(0, 80)}); reintento en ${wait}ms`);
       await new Promise(r => setTimeout(r, wait));
     }
   }
@@ -177,7 +182,7 @@ export async function handleMessage(jid, userText) {
       messages,
       tools: TOOLS,
       tool_choice: 'auto',
-      temperature: 0.4,
+      temperature: 0.65,
       max_tokens: 1024,
     });
     let completion;
@@ -215,7 +220,6 @@ export async function handleMessage(jid, userText) {
         messages[messages.length - 1] = {
           role: 'assistant',
           content: null,
-          tool_calls: assistantMsg.tool_calls,
         };
         messages.push({
           role: 'user',
@@ -239,7 +243,7 @@ export async function handleMessage(jid, userText) {
       }
 
       // Respuesta final.
-      const reply = rawContent || 'Disculpá, no pude generar una respuesta. ¿Podrías reformular?';
+      const reply = rawContent || 'Uy, no te entendí bien. ¿Me lo podés contar de otra forma?';
       appendHistory(jid, 'user', userText);
       appendHistory(jid, 'assistant', reply);
       return reply;
@@ -284,6 +288,11 @@ export async function handleMessage(jid, userText) {
             if (fnName === 'crear_reserva' && result.ok) {
               reservaCreadaEsteTurno = true;
               if (!entry.nombre && args.nombre) setNombre(jid, args.nombre);
+              if (result.data?.mensaje_confirmacion) {
+                appendHistory(jid, 'user', userText);
+                appendHistory(jid, 'assistant', result.data.mensaje_confirmacion);
+                return result.data.mensaje_confirmacion;
+              }
             }
           } catch (err) {
             console.error(`[agent] ERROR en tool ${fnName}:`);
@@ -312,7 +321,7 @@ export async function handleMessage(jid, userText) {
   }
 
   // Si excedió el loop sin respuesta final.
-  const fallback = 'Disculpá, no pude completar tu pedido en este momento. ¿Podrías reformular?';
+  const fallback = 'Uh, algo se trabó de nuestro lado. ¿Me lo repetís?';
   appendHistory(jid, 'user', userText);
   appendHistory(jid, 'assistant', fallback);
   return fallback;
