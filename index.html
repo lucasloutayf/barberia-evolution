@@ -663,6 +663,7 @@
             <textarea id="rf-mensaje" name="mensaje" rows="3"
               placeholder="¿Algo especial que debamos saber?"></textarea>
           </div>
+          <div id="turnstileContainer"></div>
           <button type="submit" class="btn btn-primary btn-submit" id="reservaSubmit">
             Confirmar reserva
           </button>
@@ -680,6 +681,7 @@
     </div>
   </div>
 
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="main.js" type="module"></script>
 </body>
