@@ -269,8 +269,7 @@ function renderCalendar(year, month) {
     const isSunday = new Date(year, month, d).getDay() === 0;
     const isToday   = iso === today;
     const isSelected = iso === selectedDate;
-    // Only count confirmed — by design; pending reservations don't display on calendar
-    const count = allReservas.filter(r => r.fecha === iso && r.estado === 'confirmada').length;
+    const count = allReservas.filter(r => r.fecha === iso && r.estado !== 'cancelada').length;
 
     const classes = [
       'cal-day',
