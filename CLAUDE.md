@@ -33,7 +33,7 @@ Static site with no framework or bundler transformations — Vite is used only a
 - See `.env.example` for the format. The build will fail silently (runtime error in browser) if these are missing.
 
 **Supabase project:** `ascxplypgexhnyaawudc` (name: `barberia`, region: `sa-east-1`)
-- Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`
+- Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`, `duracion_min` (int), `recordatorio_enviado` (bool), `confirmacion_enviada` (bool)
 - RLS policies: `anon` can INSERT only; `authenticated` can SELECT / UPDATE / DELETE.
 
 ## Key patterns
@@ -58,9 +58,10 @@ Independent Node.js subproject — **not** touched by Vite. Requires Node 20+. R
 ```bash
 cd bot
 npm install
-npm run dev                       # arranca el bot con --watch (escanear QR en consola la primera vez)
-node --test test-guard.js         # corre las 18 pruebas unitarias de guard.js
-node test-api.js                  # prueba la conexión al proveedor LLM directamente (sin bot)
+npm run dev                         # arranca el bot con --watch (escanear QR en consola la primera vez)
+node --test test-guard.js           # corre las 18 pruebas unitarias de guard.js
+node --test test-confirmaciones.js  # corre las pruebas de buildConfirmacion (format.js)
+node test-api.js                    # prueba la conexión al proveedor LLM directamente (sin bot)
 ```
 
 **Stack:** Baileys (WhatsApp) + Cerebras Qwen3 235B (MoE, ~22B activos) vía SDK de OpenAI (NLU con function calling) + Supabase service-role client + node-cron (recordatorios 24h).
@@ -78,8 +79,9 @@ El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona
 **Migración requerida** (correr una vez en SQL Editor de Supabase):
 ```sql
 ALTER TABLE public.reservas
-  ADD COLUMN IF NOT EXISTS duracion_min         integer,
-  ADD COLUMN IF NOT EXISTS recordatorio_enviado boolean DEFAULT false;
+  ADD COLUMN IF NOT EXISTS duracion_min          integer,
+  ADD COLUMN IF NOT EXISTS recordatorio_enviado  boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS confirmacion_enviada  boolean DEFAULT false;
 CREATE INDEX IF NOT EXISTS reservas_fecha_estado_idx ON public.reservas (fecha, estado);
 ```
 
@@ -91,13 +93,15 @@ CREATE INDEX IF NOT EXISTS reservas_fecha_estado_idx ON public.reservas (fecha, 
 
 **Módulos del bot:**
 - `index.js` — entry point; valida env vars, llama `guard.load()`, y hace lazy-load del resto tras cargar dotenv.
-- `whatsapp.js` — integración Baileys 7.x; pasa mensajes por `guard.check()` antes de encolarlos; llama `guard.queueDecrement()` en el `finally`. Mantiene un `inflight` Map para serializar los mensajes por JID (evita race conditions en el estado).
+- `whatsapp.js` — integración Baileys 7.x; pasa mensajes por `guard.check()` antes de encolarlos; llama `guard.queueDecrement()` en el `finally`. Mantiene un `inflight` Map para serializar los mensajes por JID (evita race conditions en el estado). Exporta `waitForConnected()` — promesa que resuelve cuando WA está conectado; usada por `confirmaciones.js` antes del startup scan.
 - `guard.js` — protección contra spam: rate limiting de doble ventana (3 msgs/10 s burst + 8 msgs/60 s), cap de cola (4 msgs pendientes por JID), sanitización (trunca a 1000 chars), y blocklist persistida en `blocklist.json`. API: `load()`, `check()`, `blockJid()`, `unblockJid()`, `isBlocked()`, `listBlocked()`, `queueDecrement()`, `sanitizeText()`.
 - `agent.js` — loop de function calling contra el proveedor OpenAI-compatible; construye el system prompt dinámicamente con el catálogo, datos del cliente y reglas de negocio. Exporta `ProviderBusyError` para manejo de 429/503.
 - `tools.js` — implementaciones de las 4 herramientas del LLM: `listar_servicios`, `consultar_disponibilidad`, `crear_reserva`, `ver_mis_reservas`.
 - `slots.js` — genera slots disponibles y detecta colisiones considerando `duracion_min`.
 - `state.js` — estado de conversación en memoria por JID (`nombre`, `telefono`, `history`). Se persiste en `state.json`; incluye lógica de migración para formatos anteriores (Gemini, JIDs `@lid`). Exporta `normalizePhoneToJid()` para convertir número de teléfono humano a JID de WhatsApp.
 - `config.js` — catálogo de servicios, horarios, `BOOKING_WINDOW_DAYS`. Exporta `findServiceByNombre()` (exact match) y `findServiceFuzzy()` (fuzzy match). Los nombres de servicio DEBEN coincidir con los `<option>` del `<select>` en `index.html`.
+- `confirmaciones.js` — suscripción Supabase Realtime a INSERT en `reservas`; si `confirmacion_enviada` es false, reclama la fila (UPDATE atómico) y envía el mensaje de confirmación por WhatsApp. Al arrancar hace un startup scan de las últimas 24 h para cubrir eventos perdidos mientras el bot estuvo apagado. Notifica al admin si el teléfono es inválido o el envío falla.
+- `format.js` — `buildConfirmacion(reserva)`: genera el texto del mensaje de confirmación de turno (día de semana, DD/MM, hora, servicio, duración, precio). Hace lookup de duración/precio desde el catálogo via `findServiceByNombre()`.
 - `scheduler.js` — cron cada 15 min para recordatorios 24 h antes de la reserva.
 - `admin.js` — comandos WhatsApp exclusivos del admin (`/turnos`, `/cancelar <id>`, `/bloquear <número>`, `/desbloquear <número>`, `/bloqueados`, `/help`); se procesan antes de llegar al LLM.
 - `supabase.js` — cliente Supabase con service-role key; todas las queries del bot pasan por aquí.

@@ -187,7 +187,7 @@ export async function connectToWhatsApp() {
       // lento.
       if (text.startsWith('/')) continue;
 
-      /* if (!isWithinBusinessHours()) {
+      if (!isWithinBusinessHours()) {
         const lastNotified = closedNotifiedAt.get(from) || 0;
         if (Date.now() - lastNotified > CLOSED_COOLDOWN_MS) {
           closedNotifiedAt.set(from, Date.now());
@@ -197,7 +197,7 @@ export async function connectToWhatsApp() {
         }
         guard.queueDecrement(from);
         continue;
-      }  */
+      } 
 
       enqueueFor(from, async () => {
         try {
