@@ -58,6 +58,7 @@ function buildMensaje(reserva) {
   ].join('\n');
 }
 
+
 export async function runOnce() {
   const now = new Date();
   const minDate = new Date(now.getTime() + WINDOW_MIN_HOURS * 3600 * 1000);
