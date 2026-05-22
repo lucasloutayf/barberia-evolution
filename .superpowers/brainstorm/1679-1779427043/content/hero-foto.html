@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero con foto — Evolution Spa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #07060A;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  .page-header {
+    padding: 1.5rem 2rem;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .page-header p {
+    font-size: .65rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.3);
+    font-weight: 600;
+  }
+  .page-header span {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1rem;
+    color: #C9A84C;
+    font-style: italic;
+  }
+
+  .variants-label {
+    text-align: center;
+    padding: 2rem 1rem .75rem;
+    font-size: .65rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.25);
+    font-weight: 700;
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    padding: 0 1rem 2rem;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: .5rem 1.4rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,.1);
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: rgba(255,255,255,.4);
+    transition: all .2s;
+    background: transparent;
+  }
+  .tab.active, .tab:hover {
+    background: rgba(201,168,76,.12);
+    border-color: rgba(201,168,76,.4);
+    color: #C9A84C;
+  }
+
+  /* ===========================
+     HERO FRAME
+     =========================== */
+  .hero-frame {
+    position: relative;
+    height: 92vh;
+    min-height: 600px;
+    overflow: hidden;
+    display: none;
+  }
+  .hero-frame.active { display: block; }
+
+  /* FOTO DE FONDO */
+  .hero-photo {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 8s ease-out;
+  }
+  .hero-frame:hover .hero-photo { transform: scale(1.03); }
+
+  /* ===========================
+     VARIANTE 1 — OSCURO DRAMÁTICO
+     =========================== */
+  #v1 .hero-photo {
+    background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=85&auto=format&fit=crop');
+  }
+  #v1 .hero-overlay {
+    background:
+      linear-gradient(to right, rgba(0,0,0,.88) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.2) 100%),
+      linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 50%);
+  }
+  #v1 .hero-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 5% 0 7%;
+    max-width: 700px;
+  }
+  #v1 .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: 1.75rem;
+  }
+  #v1 .eyebrow .dot { width: 6px; height: 6px; background: #5CB85C; border-radius: 50%; }
+  #v1 .eyebrow span {
+    font-size: .62rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
+    font-weight: 600;
+  }
+  #v1 h1 {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(4rem, 8vw, 7.5rem);
+    font-weight: 700;
+    line-height: .92;
+    letter-spacing: -.03em;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+  #v1 h1 em {
+    display: block;
+    font-style: italic;
+    font-weight: 300;
+    color: #C9A84C;
+    font-size: 1.08em;
+  }
+  #v1 .subtitle {
+    font-size: .88rem;
+    color: rgba(255,255,255,.45);
+    line-height: 1.85;
+    margin-bottom: 2.5rem;
+    max-width: 360px;
+  }
+  #v1 .actions { display: flex; gap: 1rem; align-items: center; }
+  #v1 .btn-primary {
+    background: #C9A84C;
+    color: #000;
+    padding: .9rem 2.2rem;
+    border-radius: 50px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  #v1 .btn-ghost {
+    color: rgba(255,255,255,.5);
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255,255,255,.2);
+  }
+  #v1 .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 3rem;
+    writing-mode: vertical-lr;
+    font-size: .55rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.2);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  #v1 .scroll-hint::before {
+    content: '';
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, rgba(201,168,76,.5), transparent);
+  }
+
+  /* ===========================
+     VARIANTE 2 — EDITORIAL SPLIT
+     =========================== */
+  #v2 { display: flex; }
+  #v2 .hero-photo {
+    width: 55%;
+    background-image: url('https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1200&q=85&auto=format&fit=crop');
+    background-position: center top;
+    flex-shrink: 0;
+    position: relative;
+  }
+  #v2 .hero-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent 60%, rgba(7,6,10,1) 100%);
+  }
+  #v2 .hero-panel {
+    flex: 1;
+    background: #07060A;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 5% 4rem 3%;
+    position: relative;
+  }
+  #v2 .hero-panel::before {
+    content: '';
+    position: absolute;
+    top: 20%; bottom: 20%;
+    left: 0; width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(201,168,76,.3), transparent);
+  }
+  #v2 .label-strip {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 2rem;
+  }
+  #v2 .label-strip::before {
+    content: '';
+    width: 28px; height: 1px;
+    background: #C9A84C;
+  }
+  #v2 .label-strip span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: .75rem;
+    letter-spacing: .3em;
+    color: #C9A84C;
+  }
+  #v2 h1 {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(2.8rem, 4vw, 5rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    margin-bottom: 1.5rem;
+    color: #EAE6DC;
+  }
+  #v2 h1 em {
+    display: block;
+    font-style: italic;
+    font-weight: 300;
+    color: #C9A84C;
+  }
+  #v2 p {
+    font-size: .82rem;
+    color: rgba(234,230,220,.38);
+    line-height: 1.9;
+    margin-bottom: 2.5rem;
+  }
+  #v2 .v2-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    background: #C9A84C;
+    color: #07060A;
+    padding: .9rem 2rem;
+    border-radius: 50px;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+  #v2 .v2-meta {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1.75rem;
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding-top: 1.5rem;
+  }
+  #v2 .v2-stat strong {
+    display: block;
+    font-family: 'Cormorant Garant', serif;
+    font-size: 2.2rem;
+    color: #C9A84C;
+    font-weight: 700;
+    line-height: 1;
+  }
+  #v2 .v2-stat small {
+    font-size: .6rem;
+    color: rgba(255,255,255,.25);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  /* ===========================
+     VARIANTE 3 — FULLSCREEN + TEXTO GRANDE SUPERPUESTO
+     =========================== */
+  #v3 .hero-photo {
+    background-image: url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1600&q=85&auto=format&fit=crop');
+  }
+  #v3 .hero-overlay {
+    background:
+      linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.1) 100%);
+  }
+  #v3 .hero-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 6% 5%;
+  }
+  #v3 .v3-top {
+    position: absolute;
+    top: 2rem; left: 6%;
+    right: 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #v3 .v3-logo {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+  #v3 .v3-logo em { color: #C9A84C; font-style: normal; }
+  #v3 .v3-open {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .58rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.45);
+    font-weight: 600;
+  }
+  #v3 .v3-open::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #5CB85C;
+    border-radius: 50%;
+  }
+  #v3 h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 13rem);
+    line-height: .88;
+    letter-spacing: .02em;
+    color: #fff;
+    margin-bottom: 1.25rem;
+  }
+  #v3 h1 span { color: #C9A84C; }
+  #v3 .v3-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  #v3 .v3-info {
+    font-size: .7rem;
+    color: rgba(255,255,255,.35);
+    line-height: 1.7;
+    letter-spacing: .04em;
+  }
+  #v3 .v3-info strong { color: rgba(255,255,255,.6); display: block; }
+  #v3 .v3-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    border: 1.5px solid rgba(201,168,76,.5);
+    color: #C9A84C;
+    padding: .85rem 1.8rem;
+    border-radius: 50px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Overlay base */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .hero-content { z-index: 2; }
+  .hero-photo { position: absolute; inset: 0; }
+  #v3 .hero-photo, #v1 .hero-photo { position: absolute; inset: 0; }
+
+  /* Info bottom */
+  .variant-info {
+    background: #0e0d11;
+    border-top: 1px solid rgba(201,168,76,.1);
+    padding: 1.25rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+  .variant-info p {
+    font-size: .75rem;
+    color: rgba(255,255,255,.3);
+    font-weight: 300;
+  }
+  .variant-info strong { color: rgba(255,255,255,.6); }
+
+  .select-bar {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: .72rem;
+    color: rgba(255,255,255,.2);
+    letter-spacing: .05em;
+  }
+  .select-bar strong { color: #C9A84C; }
+
+  /* active handling */
+  .hero-frame#v2 { display: none; height: 92vh; }
+  .hero-frame#v2.active { display: flex; }
+  .hero-frame#v3 .hero-content { position: absolute; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <p>Mockup · Hero con foto real</p>
+  <span>Evolution Spa & Peluquería</span>
+</div>
+
+<p class="variants-label">Elegí la composición que más te gusta</p>
+
+<div class="tabs">
+  <button class="tab active" onclick="showVariant('v1', this)">V1 — Texto izquierda · foto fondo</button>
+  <button class="tab" onclick="showVariant('v2', this)">V2 — Split editorial</button>
+  <button class="tab" onclick="showVariant('v3', this)">V3 — Texto grande abajo · Bebas</button>
+</div>
+
+<!-- VARIANTE 1 -->
+<div class="hero-frame active" id="v1">
+  <div class="hero-photo"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="eyebrow">
+      <div class="dot"></div>
+      <span>Abierto hoy · Cierra a las 8 p.m.</span>
+    </div>
+    <h1>
+      Tu mejor<em>versión.</em>
+    </h1>
+    <p class="subtitle">
+      Cortes, tinturas y tratamientos spa para hombres y mujeres.<br>
+      Atención artesanal en el corazón de Córdoba.
+    </p>
+    <div class="actions">
+      <div class="btn-primary">Reservar turno</div>
+      <div class="btn-ghost">Ver servicios ↓</div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </div>
+  <div class="variant-info">
+    <p><strong>V1 — Cinematic clásico.</strong> Foto full-screen con overlay oscuro izquierda-derecha. Título serif enorme a la izquierda. Paleta oro sobre negro.</p>
+    <p>Foto: Unsplash · barbershop</p>
+  </div>
+</div>
+
+<!-- VARIANTE 2 -->
+<div class="hero-frame" id="v2">
+  <div class="hero-photo"></div>
+  <div class="hero-panel">
+    <div class="label-strip">
+      <span>Evolution Spa & Peluquería</span>
+    </div>
+    <h1>
+      Tu mejor<em>versión.</em>
+    </h1>
+    <p>Cortes, tinturas y tratamientos spa.<br>Atención artesanal en el corazón de Córdoba.</p>
+    <div class="v2-btn">Reservar turno →</div>
+    <div class="v2-meta">
+      <div class="v2-stat">
+        <strong>5+</strong>
+        <small>Años</small>
+      </div>
+      <div class="v2-stat">
+        <strong>3.2K</strong>
+        <small>Clientes</small>
+      </div>
+      <div class="v2-stat">
+        <strong>220</strong>
+        <small>Reseñas</small>
+      </div>
+    </div>
+  </div>
+  <div class="variant-info" style="position:absolute;bottom:0;left:0;right:0;">
+    <p><strong>V2 — Split editorial.</strong> Foto ocupa el 55% izquierdo, panel oscuro a la derecha con contenido. Stats visibles en el hero.</p>
+    <p>Foto: Unsplash · barbershop interior</p>
+  </div>
+</div>
+
+<!-- VARIANTE 3 -->
+<div class="hero-frame" id="v3">
+  <div class="hero-photo"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="v3-top">
+      <div class="v3-logo"><em>E</em>volution</div>
+      <div class="v3-open">Abierto hoy</div>
+    </div>
+    <h1>TU MEJOR<br><span>VERSIÓN.</span></h1>
+    <div class="v3-bottom">
+      <div class="v3-info">
+        <strong>Córdoba, Argentina · Desde 2019</strong>
+        Mariano Fragueiro 11 · Lun–Sáb hasta las 8 p.m.
+      </div>
+      <div class="v3-btn">Reservar turno →</div>
+    </div>
+  </div>
+  <div class="variant-info" style="position:relative;z-index:10;">
+    <p><strong>V3 — Bold type + foto.</strong> Texto Bebas enorme sobre la foto. Logo arriba, CTA + info abajo. Más impactante, menos elegante.</p>
+    <p>Foto: Unsplash · barbershop chair</p>
+  </div>
+</div>
+
+<div class="select-bar">Contame en el chat cuál te gusta más o qué cambiarías. <strong>Las fotos son de Unsplash — las reemplazamos con fotos reales del local.</strong></div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.hero-frame').forEach(f => f.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

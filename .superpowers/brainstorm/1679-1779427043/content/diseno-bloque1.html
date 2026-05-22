@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diseño Bloque 1 — Hero + Estructura</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #07060A;
+  color: #EAE6DC;
+  font-family: 'Syne', sans-serif;
+}
+
+/* ── PAGE HEADER ── */
+.page-meta {
+  background: #0e0d11;
+  border-bottom: 1px solid rgba(201,168,76,.15);
+  padding: .85rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.page-meta p { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.25); }
+.page-meta strong { color: #C9A84C; }
+.badge {
+  background: rgba(201,168,76,.1);
+  border: 1px solid rgba(201,168,76,.25);
+  color: #C9A84C;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  padding: .3rem .9rem;
+  border-radius: 50px;
+}
+
+/* ══════════════════════════════
+   MOCKUP DE PÁGINA COMPLETA
+   ══════════════════════════════ */
+
+/* ── NAVBAR ── */
+.m-nav {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.75rem 4%;
+}
+.m-logo {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 1.4rem;
+  color: #fff;
+  font-weight: 400;
+  letter-spacing: .02em;
+}
+.m-logo em { color: #C9A84C; font-style: normal; font-weight: 700; }
+.m-nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+.m-nav-links a {
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+}
+.m-nav-btn {
+  background: transparent;
+  border: 1px solid rgba(201,168,76,.45);
+  color: #C9A84C;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  padding: .55rem 1.4rem;
+  border-radius: 50px;
+}
+
+/* ── HERO ── */
+.m-hero {
+  position: relative;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.m-hero-photo {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1800&q=85&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center 30%;
+  transition: transform 12s ease-out;
+}
+.m-hero-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(7,6,10,1) 0%, rgba(7,6,10,.5) 35%, rgba(7,6,10,.1) 65%, rgba(7,6,10,.35) 100%),
+    linear-gradient(to right, rgba(7,6,10,.25) 0%, transparent 50%);
+}
+
+/* Top area (navbar ya es absoluto) */
+.m-hero-top { height: 90px; }
+
+/* Center mark */
+.m-hero-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+  pointer-events: none;
+}
+.m-hero-center .dot-open {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .58rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.m-hero-center .dot-open::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #5CB85C;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(92,184,92,.2);
+}
+
+/* ── MEGA TITLE ── */
+.m-hero-bottom {
+  position: relative;
+  z-index: 2;
+  padding: 0 4% 3.5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.m-mega-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5.5rem, 15vw, 14rem);
+  line-height: .88;
+  letter-spacing: .015em;
+  color: #fff;
+}
+.m-mega-title span { color: #C9A84C; display: block; }
+
+.m-hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.5rem;
+  padding-bottom: .75rem;
+}
+.m-hero-tagline {
+  text-align: right;
+  font-family: 'Cormorant Garant', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: rgba(255,255,255,.45);
+  line-height: 1.6;
+  max-width: 220px;
+}
+.m-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  background: #C9A84C;
+  color: #07060A;
+  padding: .9rem 2rem;
+  border-radius: 50px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.m-hero-line {
+  position: absolute;
+  bottom: 0; left: 4%;
+  right: 4%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(201,168,76,.3), transparent);
+}
+
+/* ── MARQUEE ── */
+.m-marquee {
+  background: #0e0d11;
+  border-bottom: 1px solid rgba(201,168,76,.1);
+  padding: .85rem 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.m-marquee-track {
+  display: inline-flex;
+  gap: 2rem;
+  animation: mq 20s linear infinite;
+}
+.m-marquee-track span {
+  font-family: 'Cormorant Garant', serif;
+  font-style: italic;
+  font-size: .95rem;
+  color: rgba(234,230,220,.35);
+}
+.m-marquee-track .sep { color: #C9A84C; font-style: normal; font-size: .7rem; }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── STATS BAND ── */
+.m-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.m-stat {
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,.04);
+  position: relative;
+  overflow: hidden;
+}
+.m-stat:last-child { border-right: none; }
+.m-stat::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: #C9A84C;
+  transition: width .4s;
+}
+.m-stat:hover::before { width: 60%; }
+.m-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.8rem;
+  line-height: 1;
+  color: #C9A84C;
+  letter-spacing: .02em;
+}
+.m-stat-label {
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+  margin-top: .4rem;
+}
+
+/* ── SERVICIOS ── */
+.m-servicios {
+  padding: 7rem 4%;
+  position: relative;
+  overflow: hidden;
+}
+.m-servicios-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=75&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: .07;
+}
+.m-section-label {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+.m-section-label::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: #C9A84C;
+}
+.m-section-label span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: .72rem;
+  letter-spacing: .3em;
+  color: #C9A84C;
+}
+.m-section-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 7vw, 6.5rem);
+  line-height: .9;
+  color: #fff;
+  letter-spacing: .02em;
+  margin-bottom: 3.5rem;
+  position: relative;
+}
+.m-servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.m-card {
+  background: rgba(14,13,17,.95);
+  padding: 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: background .25s;
+}
+.m-card:hover { background: rgba(22,20,25,.98); }
+.m-card-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.m-card:hover .m-card-photo { opacity: .12; }
+.m-card-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4.5rem;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(201,168,76,.12);
+  line-height: 1;
+  margin-bottom: 1rem;
+  letter-spacing: .02em;
+}
+.m-card h3 {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #EAE6DC;
+  margin-bottom: .6rem;
+  letter-spacing: -.01em;
+}
+.m-card p {
+  font-size: .78rem;
+  color: rgba(234,230,220,.35);
+  line-height: 1.85;
+}
+.m-card-arrow {
+  margin-top: 1.5rem;
+  color: #C9A84C;
+  font-size: 1.1rem;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity .25s, transform .25s;
+}
+.m-card:hover .m-card-arrow { opacity: 1; transform: translateX(0); }
+
+/* ── NOSOTROS con foto ── */
+.m-nosotros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 600px;
+}
+.m-nosotros-photo {
+  position: relative;
+  overflow: hidden;
+}
+.m-nosotros-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  filter: brightness(.85) contrast(1.05);
+}
+.m-nosotros-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 70%, rgba(7,6,10,1) 100%);
+}
+.m-nosotros-content {
+  background: #07060A;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5rem 5% 5rem 4%;
+}
+.m-nosotros-content h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 5vw, 4.5rem);
+  line-height: .92;
+  letter-spacing: .02em;
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+.m-nosotros-content h2 span { color: #C9A84C; }
+.m-nosotros-content p {
+  font-size: .85rem;
+  color: rgba(234,230,220,.4);
+  line-height: 1.95;
+  margin-bottom: 2rem;
+}
+.m-nosotros-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  background: transparent;
+  border: 1px solid rgba(201,168,76,.35);
+  color: #C9A84C;
+  padding: .85rem 1.8rem;
+  border-radius: 50px;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+/* ── GALERIA ── */
+.m-galeria {
+  padding: 7rem 4%;
+  background: #0e0d11;
+}
+.m-galeria-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 280px 280px;
+  gap: 8px;
+  margin-top: 3.5rem;
+}
+.m-gal-item {
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.m-gal-item:first-child { grid-row: 1 / 3; }
+.m-gal-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .6s;
+  filter: brightness(.9) saturate(.9);
+}
+.m-gal-item:hover img { transform: scale(1.05); }
+.m-gal-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7,6,10,.6) 0%, transparent 50%);
+}
+
+/* ── OPINIONS / REVIEWS ── */
+.m-reviews {
+  padding: 7rem 4%;
+  background: #07060A;
+}
+.m-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 3.5rem;
+}
+.m-review {
+  background: #0e0d11;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 12px;
+  padding: 2rem;
+}
+.m-review-quote {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 5rem;
+  color: #C9A84C;
+  opacity: .15;
+  line-height: .7;
+  margin-bottom: -.5rem;
+}
+.m-review p {
+  font-family: 'Cormorant Garant', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(234,230,220,.55);
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+}
+.m-review-footer { display: flex; align-items: center; gap: .75rem; }
+.m-review-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9E7B2F, #C9A84C);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garant', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #07060A;
+}
+.m-review-name {
+  font-size: .78rem;
+  font-weight: 600;
+  color: #EAE6DC;
+}
+.m-review-stars { font-size: .7rem; color: #C9A84C; letter-spacing: 2px; margin-top: 2px; }
+
+/* ── CONTACTO ── */
+.m-contacto {
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+}
+.m-contacto-photo {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1521490323096-16c67b2827e0?w=1600&q=80&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center 20%;
+}
+.m-contacto-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(7,6,10,.95) 45%, rgba(7,6,10,.6) 100%);
+}
+.m-contacto-inner {
+  position: relative;
+  z-index: 2;
+  padding: 5rem 4%;
+  max-width: 540px;
+}
+.m-contacto-inner h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 6vw, 5.5rem);
+  line-height: .9;
+  letter-spacing: .02em;
+  color: #fff;
+  margin-bottom: 1.25rem;
+}
+.m-contacto-inner h2 span { color: #C9A84C; }
+.m-contacto-inner p {
+  font-size: .83rem;
+  color: rgba(255,255,255,.38);
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
+.m-contacto-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  background: #C9A84C;
+  color: #07060A;
+  padding: .95rem 2.2rem;
+  border-radius: 50px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+/* ── FOOTER ── */
+.m-footer {
+  background: #07060A;
+  border-top: 1px solid rgba(201,168,76,.12);
+  padding: 3.5rem 4% 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.m-footer-logo {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 1.6rem;
+  color: #C9A84C;
+  font-weight: 600;
+}
+.m-footer-logo small {
+  display: block;
+  font-size: .55rem;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: .2em;
+  color: rgba(255,255,255,.2);
+  text-transform: uppercase;
+  margin-top: .2rem;
+}
+.m-footer-tagline {
+  font-family: 'Cormorant Garant', serif;
+  font-style: italic;
+  font-size: .95rem;
+  color: rgba(255,255,255,.2);
+  margin-top: .5rem;
+}
+.m-footer-copy {
+  font-size: .62rem;
+  color: rgba(255,255,255,.12);
+  letter-spacing: .08em;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,.05);
+  text-align: center;
+}
+
+/* annotations */
+.anno {
+  background: rgba(201,168,76,.06);
+  border: 1px solid rgba(201,168,76,.2);
+  border-radius: 8px;
+  padding: 1.25rem 2rem;
+  margin: 2rem 4%;
+}
+.anno p {
+  font-size: .75rem;
+  color: rgba(201,168,76,.7);
+  line-height: 1.7;
+}
+.anno strong { color: #C9A84C; }
+</style>
+</head>
+<body>
+
+<div class="page-meta">
+  <p>Bloque <strong>1 de 1</strong> — Vista completa del rediseño · Evolution Spa & Peluquería</p>
+  <div class="badge">Enfoque A — Cinematic Magazine</div>
+</div>
+
+<!-- ══ HERO ══ -->
+<div class="m-hero">
+  <div class="m-hero-photo"></div>
+
+  <nav class="m-nav">
+    <div class="m-logo"><em>E</em>volution</div>
+    <ul class="m-nav-links">
+      <li><a href="#">Servicios</a></li>
+      <li><a href="#">Galería</a></li>
+      <li><a href="#">Nosotros</a></li>
+      <li><a href="#">Contacto</a></li>
+    </ul>
+    <div class="m-nav-btn">Reservar</div>
+  </nav>
+
+  <div class="m-hero-center">
+    <div class="dot-open">Abierto hoy · Cierra 8 p.m.</div>
+  </div>
+
+  <div class="m-hero-bottom">
+    <div class="m-mega-title">
+      TU MEJOR<span>VERSIÓN.</span>
+    </div>
+    <div class="m-hero-right">
+      <div class="m-hero-tagline">Cortes, tinturas y tratamientos spa en el corazón de Córdoba.</div>
+      <div class="m-hero-cta">Reservar turno →</div>
+    </div>
+    <div class="m-hero-line"></div>
+  </div>
+</div>
+
+<!-- ══ MARQUEE ══ -->
+<div class="m-marquee">
+  <div class="m-marquee-track">
+    <span>Evolution Spa & Peluquería</span><span class="sep">✦</span>
+    <span>Córdoba, Argentina</span><span class="sep">✦</span>
+    <span>Cortes · Coloración · Tratamientos</span><span class="sep">✦</span>
+    <span>Atención artesanal</span><span class="sep">✦</span>
+    <span>351 311-5571</span><span class="sep">✦</span>
+    <span>Desde 2019</span><span class="sep">✦</span>
+    <span>Evolution Spa & Peluquería</span><span class="sep">✦</span>
+    <span>Córdoba, Argentina</span><span class="sep">✦</span>
+    <span>Cortes · Coloración · Tratamientos</span><span class="sep">✦</span>
+    <span>Atención artesanal</span><span class="sep">✦</span>
+    <span>351 311-5571</span><span class="sep">✦</span>
+    <span>Desde 2019</span><span class="sep">✦</span>
+  </div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div class="m-stats">
+  <div class="m-stat">
+    <div class="m-stat-num">5+</div>
+    <div class="m-stat-label">Años de experiencia</div>
+  </div>
+  <div class="m-stat">
+    <div class="m-stat-num">3.2K</div>
+    <div class="m-stat-label">Clientes atendidos</div>
+  </div>
+  <div class="m-stat">
+    <div class="m-stat-num">6</div>
+    <div class="m-stat-label">Servicios especializados</div>
+  </div>
+  <div class="m-stat">
+    <div class="m-stat-num">220</div>
+    <div class="m-stat-label">Reseñas en Google</div>
+  </div>
+</div>
+
+<!-- ══ SERVICIOS ══ -->
+<div class="m-servicios">
+  <div class="m-servicios-bg"></div>
+  <div class="m-section-label"><span>Lo que hacemos</span></div>
+  <div class="m-section-heading">NUESTROS<br>SERVICIOS.</div>
+  <div class="m-servicios-grid">
+    <div class="m-card">
+      <div class="m-card-photo" style="background-image:url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=70')"></div>
+      <div class="m-card-num">01</div>
+      <h3>Corte de cabello</h3>
+      <p>Clásicos y modernos adaptados a tu estilo.</p>
+      <div class="m-card-arrow">→</div>
+    </div>
+    <div class="m-card">
+      <div class="m-card-photo" style="background-image:url('https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&q=70')"></div>
+      <div class="m-card-num">02</div>
+      <h3>Tintura & Coloración</h3>
+      <p>Mechas, balayage y cambios de color completos.</p>
+      <div class="m-card-arrow">→</div>
+    </div>
+    <div class="m-card">
+      <div class="m-card-photo" style="background-image:url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=70')"></div>
+      <div class="m-card-num">03</div>
+      <h3>Tratamientos Spa</h3>
+      <p>Hidratación profunda, keratinas y más.</p>
+      <div class="m-card-arrow">→</div>
+    </div>
+    <div class="m-card">
+      <div class="m-card-photo" style="background-image:url('https://images.unsplash.com/photo-1534297635766-a262cdcb8ee4?w=600&q=70')"></div>
+      <div class="m-card-num">04</div>
+      <h3>Styling & Peinados</h3>
+      <p>Para eventos especiales o el día a día.</p>
+      <div class="m-card-arrow">→</div>
+    </div>
+    <div class="m-card">
+      <div class="m-card-photo" style="background-image:url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=600&q=70')"></div>
+      <div class="m-card-num">05</div>
+      <h3>Afeitado & Barba</h3>
+      <p>Afeitado tradicional con navaja artesanal.</p>
+      <div class="m-card-arrow">→</div>
+    </div>
+    <div class="m-card">
+      <div class="m-card-photo" style="background-image:url('https://images.unsplash.com/photo-1620332372374-f108c53d2e03?w=600&q=70')"></div>
+      <div class="m-card-num">06</div>
+      <h3>Cuidado capilar</h3>
+      <p>Masajes y tratamientos anticaída.</p>
+      <div class="m-card-arrow">→</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOSOTROS ══ -->
+<div class="m-nosotros">
+  <div class="m-nosotros-photo">
+    <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=900&q=85&auto=format&fit=crop" alt="Barbería interior">
+  </div>
+  <div class="m-nosotros-content">
+    <div class="m-section-label" style="margin-bottom:.6rem"><span>Quiénes somos</span></div>
+    <h2>PASIÓN POR<br>EL <span>DETALLE.</span></h2>
+    <p>En Evolution Spa creemos que el cabello es una extensión de tu personalidad. Nuestro equipo trabaja con dedicación para que cada cliente salga sintiéndose su mejor versión.</p>
+    <p>Técnicas clásicas con tendencias actuales. Atención personalizada en cada visita.</p>
+    <div class="m-nosotros-cta">Reservar mi turno →</div>
+  </div>
+</div>
+
+<!-- ══ GALERÍA ══ -->
+<div class="m-galeria">
+  <div class="m-section-label"><span>Nuestro trabajo</span></div>
+  <div class="m-section-heading">TRANSFORMACIONES.</div>
+  <div class="m-galeria-grid">
+    <div class="m-gal-item">
+      <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&h=600&q=80&auto=format&fit=crop" alt="">
+    </div>
+    <div class="m-gal-item">
+      <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=600&h=280&q=80&auto=format&fit=crop" alt="">
+    </div>
+    <div class="m-gal-item">
+      <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&h=280&q=80&auto=format&fit=crop" alt="">
+    </div>
+    <div class="m-gal-item">
+      <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&h=280&q=80&auto=format&fit=crop" alt="">
+    </div>
+    <div class="m-gal-item">
+      <img src="https://images.unsplash.com/photo-1534297635766-a262cdcb8ee4?w=600&h=280&q=80&auto=format&fit=crop" alt="">
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVIEWS ══ -->
+<div class="m-reviews">
+  <div class="m-section-label"><span>Lo que dicen</span></div>
+  <div class="m-section-heading">OPINIONES.</div>
+  <div class="m-reviews-grid">
+    <div class="m-review">
+      <div class="m-review-quote">"</div>
+      <p>Muy buena atención y dedicación en el trabajo, me dejaron divino el pelo.</p>
+      <div class="m-review-footer">
+        <div class="m-review-avatar">M</div>
+        <div>
+          <div class="m-review-name">María G.</div>
+          <div class="m-review-stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+    <div class="m-review">
+      <div class="m-review-quote">"</div>
+      <p>Excelente servicio y muy cálida la atención. El resultado superó mis expectativas.</p>
+      <div class="m-review-footer">
+        <div class="m-review-avatar">C</div>
+        <div>
+          <div class="m-review-name">Carlos R.</div>
+          <div class="m-review-stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+    <div class="m-review">
+      <div class="m-review-quote">"</div>
+      <p>Me encantó la tintura. El equipo es muy profesional y el local está muy bien equipado.</p>
+      <div class="m-review-footer">
+        <div class="m-review-avatar">L</div>
+        <div>
+          <div class="m-review-name">Laura V.</div>
+          <div class="m-review-stars">★★★★☆</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTACTO ══ -->
+<div class="m-contacto">
+  <div class="m-contacto-photo"></div>
+  <div class="m-contacto-inner">
+    <div class="m-section-label" style="margin-bottom:.6rem"><span>Estamos para vos</span></div>
+    <h2>RESERVÁ<br>TU TURNO <span>HOY.</span></h2>
+    <p>Llamanos o visitanos. Mariano Fragueiro 11, X5000 Córdoba. Lunes a Sábado hasta las 8 p.m.</p>
+    <div class="m-contacto-btn">Llamar: 351 311-5571 →</div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<div class="m-footer">
+  <div>
+    <div class="m-footer-logo">
+      Evolution
+      <small>Spa & Peluquería · Córdoba</small>
+    </div>
+    <div class="m-footer-tagline">Tu mejor versión comienza aquí.</div>
+  </div>
+  <div style="display:flex;gap:3rem;font-size:.78rem;color:rgba(255,255,255,.25);">
+    <div>
+      <div style="color:#C9A84C;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem;font-weight:700;">Servicios</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        <span>Corte de cabello</span>
+        <span>Tintura & Coloración</span>
+        <span>Tratamientos Spa</span>
+        <span>Afeitado & Barba</span>
+      </div>
+    </div>
+    <div>
+      <div style="color:#C9A84C;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem;font-weight:700;">Contacto</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        <span>351 311-5571</span>
+        <span>Fragueiro 11, Córdoba</span>
+        <span>Lun–Sáb · 9–20 h</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="m-footer-copy">© 2025 Evolution Spa & Peluquería · Todos los derechos reservados. Hecho con ✦ en Córdoba</div>
+
+<div class="anno">
+  <p>
+    <strong>Lo que cambia vs. el diseño actual:</strong><br>
+    · Hero → foto real a pantalla completa, texto Bebas Neue gigante abajo, CTA a la derecha<br>
+    · Stats → tipografía Bebas, números más grandes y dramáticos<br>
+    · Servicios → header Bebas enorme, foto de ambiente en hover de cada card<br>
+    · Nosotros → split real con foto, sin el arte CSS de círculos<br>
+    · Galería → grid asimétrico tipo magazine con fotos reales (Unsplash)<br>
+    · Contacto → foto de barbero de fondo con overlay oscuro<br>
+    · Títulos de sección → todos pasan a Bebas Neue con más tamaño y presencia
+  </p>
+</div>
+
+</body>
+</html>

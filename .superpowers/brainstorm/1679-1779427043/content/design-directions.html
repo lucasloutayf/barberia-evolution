@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dirección de diseño — Evolution Spa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,700;1,300;1,700&family=Syne:wght@400;600;700;800&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,900;1,900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .page-title {
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.35);
+    margin-bottom: .6rem;
+  }
+  .page-heading {
+    text-align: center;
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300;
+    color: #fff;
+    margin-bottom: .5rem;
+    letter-spacing: -.01em;
+  }
+  .page-sub {
+    text-align: center;
+    font-size: .85rem;
+    color: rgba(255,255,255,.35);
+    margin-bottom: 3rem;
+    font-weight: 300;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* CARD BASE */
+  .card {
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+    transition: border-color .25s, transform .25s;
+    user-select: none;
+  }
+  .card:hover { transform: translateY(-4px); }
+  .card.selected { border-color: #C9A84C; }
+  .card.selected .select-badge { opacity: 1; }
+
+  .select-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: #C9A84C;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: .28rem .85rem;
+    border-radius: 50px;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+
+  .card-label {
+    position: absolute;
+    top: 1rem; left: 1rem;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(8px);
+    color: rgba(255,255,255,.55);
+    font-family: 'Syne', sans-serif;
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: .25rem .8rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,.1);
+    z-index: 10;
+  }
+
+  .card-bottom {
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(12px);
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .card-bottom h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: .82rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: .2rem;
+    letter-spacing: .04em;
+  }
+  .card-bottom p {
+    font-size: .75rem;
+    color: rgba(255,255,255,.38);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* ================================
+     OPCION A — EDITORIAL LUXURY
+     ================================ */
+  .hero-a {
+    height: 380px;
+    background: #f5f0e8;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .a-left {
+    width: 42%;
+    background: #1a1612;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .a-left::before {
+    content: 'E';
+    position: absolute;
+    font-family: 'Cormorant Garant', serif;
+    font-size: 18rem;
+    font-weight: 700;
+    color: rgba(201,168,76,.05);
+    top: -2rem; left: -3rem;
+    line-height: 1;
+  }
+  .a-eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: .52rem;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    margin-bottom: .7rem;
+    font-weight: 700;
+  }
+  .a-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 3.2rem;
+    font-weight: 300;
+    line-height: 1;
+    color: #f5f0e8;
+    letter-spacing: -.02em;
+  }
+  .a-title em {
+    font-style: italic;
+    color: #C9A84C;
+    display: block;
+    font-size: 1.1em;
+  }
+  .a-line {
+    width: 36px; height: 1px;
+    background: #C9A84C;
+    margin: 1.2rem 0;
+  }
+  .a-desc {
+    font-family: 'Syne', sans-serif;
+    font-size: .62rem;
+    color: rgba(245,240,232,.4);
+    line-height: 1.8;
+    letter-spacing: .03em;
+  }
+
+  .a-right {
+    flex: 1;
+    background: #f5f0e8;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1.25rem;
+  }
+  .a-service {
+    border-bottom: 1px solid rgba(26,22,18,.1);
+    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .a-service:last-child { border-bottom: none; padding-bottom: 0; }
+  .a-service-name {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.05rem;
+    color: #1a1612;
+    font-weight: 400;
+    letter-spacing: -.01em;
+  }
+  .a-service-price {
+    font-family: 'Syne', sans-serif;
+    font-size: .65rem;
+    color: #C9A84C;
+    font-weight: 700;
+    letter-spacing: .1em;
+  }
+  .a-cta {
+    margin-top: .5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: #1a1612;
+    color: #f5f0e8;
+    font-family: 'Syne', sans-serif;
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: .7rem 1.4rem;
+    border-radius: 0;
+    width: fit-content;
+  }
+
+  /* ================================
+     OPCION B — CINEMATIC
+     ================================ */
+  .hero-b {
+    height: 380px;
+    position: relative;
+    overflow: hidden;
+    background: #070707;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .b-photo {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(160deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.75) 100%),
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(40,30,10,.6) 0%, transparent 65%),
+      linear-gradient(135deg, #1a1200 0%, #0d0a05 40%, #050403 100%);
+  }
+  .b-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, rgba(0,0,0,.03) 0px, rgba(0,0,0,.03) 1px, transparent 1px, transparent 2px
+    );
+  }
+  /* Simulated person silhouette */
+  .b-silhouette {
+    position: absolute;
+    right: 12%;
+    bottom: 0;
+    width: 200px;
+    height: 320px;
+    background: linear-gradient(180deg,
+      rgba(201,168,76,.15) 0%,
+      rgba(180,140,60,.08) 30%,
+      transparent 100%
+    );
+    clip-path: polygon(30% 0%, 70% 0%, 85% 8%, 90% 25%, 78% 45%, 80% 60%, 100% 100%, 0% 100%, 20% 60%, 22% 45%, 10% 25%, 15% 8%);
+  }
+  .b-content {
+    position: relative;
+    z-index: 2;
+    text-align: left;
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+    margin-left: 1rem;
+  }
+  .b-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .b-dot { width: 6px; height: 6px; background: #5CB85C; border-radius: 50%; }
+  .b-eyebrow span {
+    font-family: 'Syne', sans-serif;
+    font-size: .55rem;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.45);
+    font-weight: 600;
+  }
+  .b-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    line-height: .95;
+    letter-spacing: -.03em;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  .b-title em {
+    display: block;
+    font-style: italic;
+    font-weight: 300;
+    color: #C9A84C;
+  }
+  .b-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    background: #C9A84C;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: .8rem 1.6rem;
+    border-radius: 50px;
+  }
+  .b-scroll {
+    position: absolute;
+    bottom: 1.25rem;
+    right: 1.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: .5rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.2);
+    writing-mode: vertical-lr;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .b-scroll::before {
+    content: '';
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(to bottom, rgba(201,168,76,.4), transparent);
+  }
+
+  /* ================================
+     OPCION C — AVANT-GARDE / BOLD TYPE
+     ================================ */
+  .hero-c {
+    height: 380px;
+    background: #0c0c0c;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+  .c-giant-text {
+    position: absolute;
+    top: -1.5rem; left: -.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13.5rem;
+    line-height: .88;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(201,168,76,.12);
+    pointer-events: none;
+    white-space: nowrap;
+    letter-spacing: -.02em;
+  }
+  .c-accent-line {
+    position: absolute;
+    top: 0; right: 3.5rem;
+    width: 1px;
+    height: 45%;
+    background: linear-gradient(to bottom, transparent, #C9A84C, transparent);
+  }
+  .c-number {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-family: 'Cormorant Garant', serif;
+    font-size: .75rem;
+    color: rgba(201,168,76,.5);
+    letter-spacing: .1em;
+  }
+  .c-bottom {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1.75rem;
+    border-top: 1px solid rgba(255,255,255,.06);
+    background: linear-gradient(to top, rgba(12,12,12,1), transparent);
+  }
+  .c-bottom-left {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+  }
+  .c-eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: .52rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: #C9A84C;
+    font-weight: 700;
+  }
+  .c-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem;
+    line-height: .9;
+    color: #fff;
+    letter-spacing: .02em;
+  }
+  .c-title span {
+    color: #C9A84C;
+  }
+  .c-cta {
+    align-self: flex-end;
+    border: 1px solid rgba(201,168,76,.35);
+    color: #C9A84C;
+    font-family: 'Syne', sans-serif;
+    font-size: .55rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: .65rem 1.25rem;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  /* ================================
+     OPCION D — PREMIUM ARGENTINO
+     ================================ */
+  .hero-d {
+    height: 380px;
+    background: linear-gradient(145deg, #1a1208 0%, #110e06 50%, #0d0b05 100%);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .d-warm-glow {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 30% 35%, rgba(201,140,40,.14) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 80% 70%, rgba(180,100,30,.07) 0%, transparent 55%);
+  }
+  .d-texture {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -52deg, transparent, transparent 90px,
+      rgba(201,168,76,.018) 90px, rgba(201,168,76,.018) 91px
+    );
+  }
+  .d-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem 0;
+  }
+  .d-logo {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.2rem;
+    color: #C9A84C;
+    font-weight: 400;
+    letter-spacing: .04em;
+  }
+  .d-logo span {
+    font-size: .5rem;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,.5);
+    display: block;
+    margin-top: .15rem;
+  }
+  .d-badge {
+    background: rgba(201,168,76,.12);
+    border: 1px solid rgba(201,168,76,.25);
+    border-radius: 50px;
+    padding: .3rem .9rem;
+    font-family: 'Syne', sans-serif;
+    font-size: .52rem;
+    color: rgba(201,168,76,.8);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .d-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: #5CB85C;
+    border-radius: 50%;
+  }
+  .d-center {
+    position: relative;
+    z-index: 2;
+    padding: 0 1.75rem;
+    text-align: center;
+  }
+  .d-eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: .52rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,.55);
+    margin-bottom: .75rem;
+    font-weight: 600;
+  }
+  .d-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 3.6rem;
+    font-weight: 600;
+    line-height: 1.0;
+    color: #f0e8d6;
+    letter-spacing: -.02em;
+    margin-bottom: .4rem;
+  }
+  .d-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: #C9A84C;
+    display: block;
+    font-size: 1.05em;
+  }
+  .d-subtitle {
+    font-family: 'Syne', sans-serif;
+    font-size: .6rem;
+    color: rgba(240,232,214,.38);
+    letter-spacing: .08em;
+    line-height: 1.8;
+  }
+  .d-bottom {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem 1.5rem;
+  }
+  .d-stats {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .d-stat {
+    text-align: center;
+  }
+  .d-stat strong {
+    display: block;
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.6rem;
+    color: #C9A84C;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .d-stat small {
+    font-family: 'Syne', sans-serif;
+    font-size: .5rem;
+    color: rgba(240,232,214,.3);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .d-cta {
+    background: #C9A84C;
+    color: #0d0b05;
+    font-family: 'Syne', sans-serif;
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: .75rem 1.4rem;
+    border-radius: 50px;
+  }
+
+  /* Instruction */
+  .instruction {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-size: .78rem;
+    color: rgba(255,255,255,.22);
+    font-weight: 300;
+  }
+  .instruction strong { color: rgba(255,255,255,.45); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<p class="page-title">Brainstorming visual · Evolution Spa & Peluquería</p>
+<h1 class="page-heading">¿Qué dirección de diseño querés?</h1>
+<p class="page-sub">Cada card es un mockup del hero + identidad visual. Hacé click para seleccionar.</p>
+
+<div class="grid">
+
+  <!-- A: EDITORIAL LUXURY -->
+  <div class="card" onclick="this.classList.toggle('selected')">
+    <span class="card-label">A</span>
+    <span class="select-badge">✓ Seleccionado</span>
+    <div class="hero-a">
+      <div class="a-left">
+        <div class="a-eyebrow">Córdoba · Desde 2019</div>
+        <div class="a-title">
+          Tu mejor<em>versión</em>
+        </div>
+        <div class="a-line"></div>
+        <div class="a-desc">Atención artesanal<br>en el corazón de Córdoba</div>
+        <div class="a-cta">Reservar turno →</div>
+      </div>
+      <div class="a-right">
+        <div class="a-service">
+          <span class="a-service-name">Corte de cabello</span>
+          <span class="a-service-price">desde $3.500</span>
+        </div>
+        <div class="a-service">
+          <span class="a-service-name">Tintura & Coloración</span>
+          <span class="a-service-price">desde $7.000</span>
+        </div>
+        <div class="a-service">
+          <span class="a-service-name">Tratamiento Spa</span>
+          <span class="a-service-price">desde $5.500</span>
+        </div>
+        <div class="a-service">
+          <span class="a-service-name">Afeitado & Barba</span>
+          <span class="a-service-price">desde $2.500</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-bottom">
+      <h3>A — Editorial de lujo</h3>
+      <p>Split layout negro/crema. Tipografía serif ultra-fina. Servicios como lista de revista. Contraste extremo claro/oscuro.</p>
+    </div>
+  </div>
+
+  <!-- B: CINEMATIC -->
+  <div class="card" onclick="this.classList.toggle('selected')">
+    <span class="card-label">B</span>
+    <span class="select-badge">✓ Seleccionado</span>
+    <div class="hero-b">
+      <div class="b-photo"></div>
+      <div class="b-silhouette"></div>
+      <div class="b-content">
+        <div class="b-eyebrow">
+          <div class="b-dot"></div>
+          <span>Abierto hoy · Cierra 8 p.m.</span>
+        </div>
+        <div class="b-title">
+          Tu mejor<em>versión.</em>
+        </div>
+        <div class="b-cta">Reservar turno →</div>
+      </div>
+      <div class="b-scroll">Scroll</div>
+    </div>
+    <div class="card-bottom">
+      <h3>B — Cinematic dark drama</h3>
+      <p>Hero a pantalla completa, tipografía gigante a la izquierda, silhouette o foto de alta calidad. Máximo impacto al cargar.</p>
+    </div>
+  </div>
+
+  <!-- C: AVANT-GARDE -->
+  <div class="card" onclick="this.classList.toggle('selected')">
+    <span class="card-label">C</span>
+    <span class="select-badge">✓ Seleccionado</span>
+    <div class="hero-c">
+      <div class="c-giant-text">EVOLUTION</div>
+      <div class="c-accent-line"></div>
+      <div class="c-number">01 / 06</div>
+      <div class="c-bottom">
+        <div class="c-bottom-left">
+          <div class="c-eyebrow">Spa & Peluquería · Córdoba</div>
+          <div class="c-title">
+            Tu mejor<br><span>versión.</span>
+          </div>
+        </div>
+        <div class="c-cta">Reservar →</div>
+      </div>
+    </div>
+    <div class="card-bottom">
+      <h3>C — Avant-garde / Bold type</h3>
+      <p>El nombre "EVOLUTION" gigante como fondo tipográfico. Layout minimalista. Bebas Neue como elemento visual dominante.</p>
+    </div>
+  </div>
+
+  <!-- D: PREMIUM ARGENTINO -->
+  <div class="card" onclick="this.classList.toggle('selected')">
+    <span class="card-label">D</span>
+    <span class="select-badge">✓ Seleccionado</span>
+    <div class="hero-d">
+      <div class="d-warm-glow"></div>
+      <div class="d-texture"></div>
+      <div class="d-top">
+        <div class="d-logo">
+          Evolution
+          <span>Spa & Peluquería</span>
+        </div>
+        <div class="d-badge">Abierto hoy</div>
+      </div>
+      <div class="d-center">
+        <div class="d-eyebrow">Córdoba · Desde 2019</div>
+        <div class="d-title">
+          Tu mejor<em>versión</em>
+        </div>
+        <div class="d-subtitle">Cortes · Tinturas · Tratamientos spa<br>Atención artesanal en el centro</div>
+      </div>
+      <div class="d-bottom">
+        <div class="d-stats">
+          <div class="d-stat">
+            <strong>5+</strong>
+            <small>Años</small>
+          </div>
+          <div class="d-stat">
+            <strong>3.2K</strong>
+            <small>Clientes</small>
+          </div>
+          <div class="d-stat">
+            <strong>220</strong>
+            <small>Reseñas</small>
+          </div>
+        </div>
+        <div class="d-cta">Reservar turno →</div>
+      </div>
+    </div>
+    <div class="card-bottom">
+      <h3>D — Premium cálido</h3>
+      <p>Dorado más cálido, glow ambar, stats visibles en hero, badge "Abierto hoy" prominente. Lujoso pero cercano.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="instruction"><strong>Hacé click</strong> en la que más te gusta, y contame en el chat cuál elegiste o qué combinarías.</p>
+
+<script>
+// No server-side events needed - user will tell us in chat
+</script>
+</body>
+</html>
