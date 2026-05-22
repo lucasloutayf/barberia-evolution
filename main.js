@@ -57,9 +57,39 @@ initConfig()
   let turnstileToken = null;
   let widgetId = null;
 
-  function populateSlotsForDay(dayOfWeek) {
+  async function loadAndPopulateSlots(dayOfWeek, fechaISO) {
+    horaSelect.innerHTML = '<option value="" disabled selected>Cargando horarios…</option>';
+    horaSelect.disabled = true;
+
+    let blocked = new Set();
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-slots?fecha=${fechaISO}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        blocked = new Set(data.blocked ?? []);
+      }
+    } catch { /* mostrar todos los slots si falla la consulta */ }
+
+    // Si es hoy, calcular cutoff = hora actual + 60 min en TZ del salón
+    const todayAR = new Intl.DateTimeFormat('sv-SE', { timeZone: cfg.horario.timezone }).format(new Date());
+    let cutoff = -1;
+    if (fechaISO === todayAR) {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: cfg.horario.timezone, hour: '2-digit', minute: '2-digit', hour12: false,
+      }).formatToParts(new Date());
+      const h = parseInt(parts.find(p => p.type === 'hour').value, 10);
+      const m = parseInt(parts.find(p => p.type === 'minute').value, 10);
+      cutoff = h * 60 + m + 60;
+    }
+
     horaSelect.innerHTML = '<option value="" disabled selected>Seleccioná un horario</option>';
+    horaSelect.disabled = false;
+
     const franjas = cfg.horario.dias[dayOfWeek] ?? [];
+    let anyAvailable = false;
+
     for (const { apertura, cierre } of franjas) {
       const [sH, sM] = apertura.split(':').map(Number);
       const [eH, eM] = cierre.split(':').map(Number);
@@ -68,26 +98,41 @@ initConfig()
           if (h === eH && m > eM) break;
           const hh = String(h).padStart(2, '0');
           const mm = String(m).padStart(2, '0');
+          const slotStr = `${hh}:${mm}`;
+          const slotMin = h * 60 + m;
+
           const opt = document.createElement('option');
-          opt.value = `${hh}:${mm}`;
-          opt.textContent = `${hh}:${mm} hs`;
+          opt.value = slotStr;
+
+          if (blocked.has(slotStr)) {
+            opt.textContent = `${slotStr} hs — ocupado`;
+            opt.disabled = true;
+          } else if (cutoff >= 0 && slotMin <= cutoff) {
+            opt.textContent = `${slotStr} hs — no disponible`;
+            opt.disabled = true;
+          } else {
+            opt.textContent = `${slotStr} hs`;
+            anyAvailable = true;
+          }
+
           horaSelect.appendChild(opt);
         }
       }
     }
+
+    if (!anyAvailable) {
+      horaSelect.innerHTML = '<option value="" disabled selected>No hay turnos disponibles para este día</option>';
+    }
   }
 
-  // --- Rango de fecha: mañana → +BOOKING_WINDOW días, sin días cerrados ---
+  // --- Rango de fecha: hoy → +BOOKING_WINDOW días, sin días cerrados ---
   function setupFechaInput() {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const maxDate = new Date(today);
-    maxDate.setDate(today.getDate() + BOOKING_WINDOW);
+    const fmtAR = d => new Intl.DateTimeFormat('sv-SE', { timeZone: cfg.horario.timezone }).format(d);
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + BOOKING_WINDOW);
 
-    const fmt = d => d.toISOString().split('T')[0];
-    fechaInput.min = fmt(tomorrow);
-    fechaInput.max = fmt(maxDate);
+    fechaInput.min = fmtAR(new Date());
+    fechaInput.max = fmtAR(maxDate);
 
     fechaInput.addEventListener('input', () => {
       const chosen = new Date(fechaInput.value + 'T00:00:00');
@@ -98,7 +143,7 @@ initConfig()
         horaSelect.innerHTML = '<option value="" disabled selected>Seleccioná un horario</option>';
       } else {
         fechaInput.setCustomValidity('');
-        populateSlotsForDay(day);
+        loadAndPopulateSlots(day, fechaInput.value).catch(console.error);
       }
     });
   }
@@ -502,7 +547,7 @@ document.querySelectorAll('.before-after').forEach(ba => {
   }
   animateRing();
 
-  const hoverTargets = 'a, button, .servicio-card, .galeria-card, .opinion-card, .open-modal, input, select, textarea';
+  const hoverTargets = 'a, button, .servicio-card, .galeria-item, .opinion-card, .open-modal, input, select, textarea';
   document.querySelectorAll(hoverTargets).forEach(el => {
     el.addEventListener('mouseenter', () => ring.classList.add('is-hover'));
     el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
