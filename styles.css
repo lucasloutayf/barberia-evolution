@@ -169,6 +169,27 @@ h1, h2, h3, h4 {
   padding: 0 2rem;
 }
 
+/* Encabezados de sección en Bebas Neue — usado en Servicios, Galería, Nosotros, Contacto */
+.section-heading-bebas {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 6vw, 6rem);
+  line-height: .9;
+  letter-spacing: .02em;
+  color: #fff;
+  margin-bottom: 3.5rem;
+}
+
+.section-header-left {
+  text-align: left;
+  max-width: none;
+  margin: 0 0 3.5rem;
+}
+.section-header-left .section-label {
+  justify-content: flex-start;
+}
+.section-header-left .section-label::before { display: inline-block; }
+.section-header-left .section-label::after { display: none; }
+
 /* =====================
    CANVAS
    ===================== */
@@ -733,13 +754,13 @@ h1, h2, h3, h4 {
 }
 
 .stat-number {
-  font-family: 'Cormorant Garant', serif;
-  font-size: clamp(3.8rem, 7.5vw, 6.5rem);
-  font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 7vw, 6rem);
+  font-weight: 400;
   color: var(--gold);
   line-height: 1;
   margin-bottom: .55rem;
-  letter-spacing: -.03em;
+  letter-spacing: .02em;
 }
 
 .stat-label {
