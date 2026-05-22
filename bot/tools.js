@@ -4,7 +4,7 @@
 import { SERVICES, findServiceByNombre, findServiceFuzzy } from './config.js';
 import {
   generateAllSlots, slotsForService, hasCollision,
-  validateFecha, validateHora, dayOfWeekFor,
+  validateFecha, validateHora, dayOfWeekFor, todayISO, currentTZMinutes,
 } from './slots.js';
 import {
   listActivasByFecha, insertReserva, updateReserva, cancelReserva,
@@ -34,7 +34,17 @@ export async function consultar_disponibilidad({ fecha, servicio }) {
 
   const dayOfWeek = dayOfWeekFor(fecha);
   const reservas = await listActivasByFecha(fecha);
-  const horarios = slotsForService(svc.duracion_min, reservas, dayOfWeek);
+  let horarios = slotsForService(svc.duracion_min, reservas, dayOfWeek);
+
+  // Filter out past slots when booking for today (30-min buffer)
+  if (fecha === todayISO()) {
+    const cutoff = currentTZMinutes() + 30;
+    horarios = horarios.filter(h => {
+      const [hh, mm] = h.split(':').map(Number);
+      return hh * 60 + mm > cutoff;
+    });
+  }
+
   return {
     ok: true,
     data: {
@@ -56,6 +66,14 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
   const dayOfWeek = dayOfWeekFor(fecha);
   const vh = validateHora(hora, dayOfWeek);
   if (!vh.ok) return { ok: false, error: vh.error };
+
+  // Reject past slots when booking for today
+  if (fecha === todayISO()) {
+    const [hh, mm] = hora.split(':').map(Number);
+    if (hh * 60 + mm <= currentTZMinutes() + 30) {
+      return { ok: false, error: `La hora ${hora} ya pasó o está muy próxima. Elegí un horario con al menos 30 minutos de anticipación.` };
+    }
+  }
 
   const svc = findServiceByNombre(servicio) || findServiceFuzzy(servicio);
   if (!svc) return { ok: false, error: `Servicio "${servicio}" no existe.` };
@@ -123,6 +141,13 @@ export async function modificar_reserva({ id, nueva_fecha, nueva_hora }) {
   const dayOfWeek = dayOfWeekFor(fecha);
   const vh = validateHora(hora, dayOfWeek);
   if (!vh.ok) return { ok: false, error: vh.error };
+
+  if (fecha === todayISO()) {
+    const [hh, mm] = hora.split(':').map(Number);
+    if (hh * 60 + mm <= currentTZMinutes() + 30) {
+      return { ok: false, error: `La hora ${hora} ya pasó o está muy próxima.` };
+    }
+  }
 
   const duracion = actual.duracion_min || 30;
   const reservas = await listActivasByFecha(fecha);

@@ -1750,6 +1750,13 @@ h1, h2, h3, h4 {
 }
 .form-error-msg.show { display: block; }
 
+#turnstileContainer {
+  min-height: 65px;
+  margin-bottom: .25rem;
+  display: flex;
+  align-items: center;
+}
+
 /* Success */
 .reserva-success {
   text-align: center;

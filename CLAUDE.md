@@ -10,7 +10,7 @@ npm run build    # Production build (emits both index.html and admin.html)
 npm run preview  # Preview production build
 ```
 
-There are no test or lint scripts configured.
+There are no test or lint scripts configured for the frontend.
 
 Always serve via HTTP — never open files directly as `file://` (breaks CDN scripts and Supabase fetch calls).
 
@@ -21,35 +21,67 @@ Static site with no framework or bundler transformations — Vite is used only a
 **Files:**
 - `index.html` / `styles.css` / `main.js` — Public landing page
 - `admin.html` / `admin.css` / `admin.js` — Private reservations panel (Supabase Auth login)
+- `barberia.config.js` — **Single source of truth** for all business config (name, address, phone, services catalog, schedule, booking window). Both `main.js` and `bot/config.js` import from this file. Edge Functions duplicate `SERVICE_DURATIONS` inline and must be kept in sync manually.
 
 `vite.config.js` declares both `index.html` and `admin.html` as `rollupOptions.input` entries. Any new HTML page must be added there or it won't be emitted by `vite build`.
 
 **External dependencies (CDN, not npm):**
-- Supabase JS client loaded via `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">` — exposes `window.supabase`. Always reference as `window.supabase.createClient(...)` in scripts that Vite may treat as modules.
+- Supabase JS client via `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">` — exposes `window.supabase`. Always reference as `window.supabase.createClient(...)` in scripts that Vite may treat as modules.
+- Cloudflare Turnstile via CDN — exposes `window.turnstile`. Used in the reservation modal for bot protection.
 
 **Environment variables (`.env`, gitignored):**
-- `VITE_SUPABASE_URL` — project URL
-- `VITE_SUPABASE_ANON_KEY` — anon public key
+- `VITE_SUPABASE_URL` — project URL (also used to call Edge Functions at `$URL/functions/v1/`)
+- `VITE_SUPABASE_ANON_KEY` — anon public key (admin panel auth only; form submissions go through Edge Functions)
+- `VITE_TURNSTILE_SITE_KEY` — Cloudflare Turnstile site key for the reservation form widget
 - See `.env.example` for the format. The build will fail silently (runtime error in browser) if these are missing.
 
 **Supabase project:** `ascxplypgexhnyaawudc` (name: `barberia`, region: `sa-east-1`)
-- Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`, `duracion_min` (int), `recordatorio_enviado` (bool), `confirmacion_enviada` (bool)
-- RLS policies: `anon` can INSERT only; `authenticated` can SELECT / UPDATE / DELETE.
+- Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`, `duracion_min` (int), `recordatorio_enviado` (bool), `confirmacion_enviada` (bool), `ip` (text)
+- Table: `public._ip_attempts` — fields: `ip` (text), `attempted_at` (timestamptz, default now()). Used by `create-reserva` for rate limiting (10 requests per IP per 15 min).
+- RLS policies: `anon` can INSERT only on `reservas`; `authenticated` can SELECT / UPDATE / DELETE.
 
 ## Key patterns
+
+**Config injection (`barberia.config.js`):** `main.js` calls `initConfig()` at startup to populate any element with `data-cfg="nombre"` with the business name, and similarly hydrates address, phone links, WhatsApp links, and the service `<select>` from the config. To change business info, edit only `barberia.config.js`.
 
 **Visibility toggling:** Use `style.display = 'none'` / `style.display = ''` everywhere. Do NOT use the HTML `hidden` attribute — Vite module scripts cannot reliably clear it with `element.hidden = false`.
 
 **Admin auth:** Email + password login via Supabase Auth (`signInWithPassword`). Session is managed by the Supabase client (persisted in `localStorage`); on page load `getSession()` decides whether to show the dashboard or the login screen. Dashboard events are bound inside `showDashboard()` (called after login), not at top level.
 
-**Modal (index.html):** Reservation form modal triggered by `.open-modal` class or `#navReservar`. The Supabase client in `main.js` is initialized at top level (safe because `main.js` loads after the CDN script).
+**Reservation form flow:** Modal collects data → Turnstile widget must be completed first → form submits to `create-reserva` Edge Function via `fetch`. `main.js` does NOT write to Supabase directly. Slot availability is fetched from `get-slots` Edge Function each time the user picks a date.
 
-**Booking constraints (hard-coded in `main.js`):**
-- Time slots are generated client-side in 30-minute increments from 09:00 to 19:30.
-- Bookable date range is tomorrow → +45 days; Sundays are blocked via `setCustomValidity`.
-- Changing business hours or the booking window requires editing the slot loop and `setupFechaInput()` in `main.js` — there is no config file.
+**Booking constraints (driven by `barberia.config.js`):**
+- Time slots generated from `cfg.horario.dias[dayOfWeek]` franjas (apertura/cierre pairs) in `cfg.horario.intervalo`-minute increments.
+- Bookable date range is today → +`cfg.ventanaReservaDias` days; days with empty franjas are blocked via `setCustomValidity`.
+- Blocked slots are fetched from the `get-slots` Edge Function (collision-aware, respects `duracion_min`).
+- To change hours or window: edit `barberia.config.js` only (frontend and bot pick it up automatically; update Edge Functions' `SERVICE_DURATIONS` manually if service durations change).
 
 **Admin mutations are optimistic:** `updateEstado` and `deleteReserva` mutate the in-memory `allReservas` array and re-render, instead of refetching from Supabase. New admin actions should follow the same pattern (or call `loadReservas()` to refresh) so the table and stat counters stay in sync.
+
+## Supabase Edge Functions (`supabase/functions/`)
+
+Deployed as Deno/TypeScript. Both require these Supabase-injected env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Both enforce CORS against an allowlist: `http://localhost:5173` and the `ALLOWED_ORIGIN` env var (set to the production domain when deploying).
+
+**`get-slots`** — `GET ?fecha=YYYY-MM-DD`. Returns `{ blocked: string[] }` — all 30-min slot strings that are taken on that date (considering multi-slot services via `duracion_min`). Uses `anon` read on `reservas` filtered by date and non-cancelled status.
+
+**`create-reserva`** — `POST`. Validates Turnstile token with Cloudflare Siteverify (requires `TURNSTILE_SECRET_KEY` env var), rate-limits by IP via `_ip_attempts` table (10/15 min), checks slot collisions, then INSERTs into `reservas` using service-role key (bypasses RLS).
+
+**Critical sync requirement:** Both Edge Functions contain a hardcoded `SERVICE_DURATIONS` map that must stay in sync with `barberia.config.js servicios[].{nombre, duracion}`. There is no shared module between Deno functions and the Node/browser code — update all three locations when adding or renaming services.
+
+**Required migration** (run once in Supabase SQL Editor):
+```sql
+ALTER TABLE public.reservas
+  ADD COLUMN IF NOT EXISTS duracion_min          integer,
+  ADD COLUMN IF NOT EXISTS recordatorio_enviado  boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS confirmacion_enviada  boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS ip                    text;
+CREATE INDEX IF NOT EXISTS reservas_fecha_estado_idx ON public.reservas (fecha, estado);
+CREATE TABLE IF NOT EXISTS public._ip_attempts (
+  ip           text        NOT NULL,
+  attempted_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS ip_attempts_ip_at_idx ON public._ip_attempts (ip, attempted_at);
+```
 
 ## Bot de WhatsApp (`bot/`)
 
@@ -61,6 +93,7 @@ npm install
 npm run dev                         # arranca el bot con --watch (escanear QR en consola la primera vez)
 node --test test-guard.js           # corre las 18 pruebas unitarias de guard.js
 node --test test-confirmaciones.js  # corre las pruebas de buildConfirmacion (format.js)
+node --test test-config.js          # verifica que bot/config.js esté sincronizado con barberia.config.js
 node test-api.js                    # prueba la conexión al proveedor LLM directamente (sin bot)
 ```
 
@@ -76,18 +109,9 @@ El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona
 - `AI_MODEL_FALLBACK` — modelo alternativo si el primario devuelve 429/503.
 - `ADMIN_JID` — JID del WhatsApp del admin (`<numero>@s.whatsapp.net`).
 
-**Migración requerida** (correr una vez en SQL Editor de Supabase):
-```sql
-ALTER TABLE public.reservas
-  ADD COLUMN IF NOT EXISTS duracion_min          integer,
-  ADD COLUMN IF NOT EXISTS recordatorio_enviado  boolean DEFAULT false,
-  ADD COLUMN IF NOT EXISTS confirmacion_enviada  boolean DEFAULT false;
-CREATE INDEX IF NOT EXISTS reservas_fecha_estado_idx ON public.reservas (fecha, estado);
-```
+**Catálogo de servicios** (precios y duraciones) vive en [barberia.config.js](barberia.config.js) en la raíz. `bot/config.js` importa desde allí y re-exporta los valores que necesita el bot. Los nombres DEBEN coincidir exactamente con los `<option>` del `<select>` de [index.html](index.html) (que también se genera desde `barberia.config.js`) y con el `SERVICE_DURATIONS` hardcodeado en las Edge Functions.
 
-**Catálogo de servicios** (precios y duraciones) vive en [bot/config.js](bot/config.js). Los nombres DEBEN coincidir exactamente con los `<option>` del `<select>` de [index.html](index.html) para que el panel admin los muestre consistentes.
-
-**Reglas compartidas con el frontend:** horario Lun-Sáb 09:00–19:30, slots cada 30 min, ventana de reserva tomorrow → +45 días, Domingos cerrado. Si cambian acá, también editar `BUSINESS_HOURS` en [bot/config.js](bot/config.js) y los hard-codes en [main.js](main.js).
+**Reglas compartidas con el frontend:** horario Lun-Sáb 09:00–19:30, slots cada 30 min, ventana de reserva today → +45 días, Domingos cerrado. Si cambian, editar solo `barberia.config.js` para el frontend y el bot. Las Edge Functions requieren actualización manual de `SERVICE_DURATIONS`.
 
 **A diferencia del formulario web**, el bot SÍ chequea colisiones y bloquea slots consecutivos según `duracion_min` del servicio. Las reservas viejas sin `duracion_min` se tratan como 30 min.
 
@@ -99,7 +123,7 @@ CREATE INDEX IF NOT EXISTS reservas_fecha_estado_idx ON public.reservas (fecha, 
 - `tools.js` — implementaciones de las 4 herramientas del LLM: `listar_servicios`, `consultar_disponibilidad`, `crear_reserva`, `ver_mis_reservas`.
 - `slots.js` — genera slots disponibles y detecta colisiones considerando `duracion_min`.
 - `state.js` — estado de conversación en memoria por JID (`nombre`, `telefono`, `history`). Se persiste en `state.json`; incluye lógica de migración para formatos anteriores (Gemini, JIDs `@lid`). Exporta `normalizePhoneToJid()` para convertir número de teléfono humano a JID de WhatsApp.
-- `config.js` — catálogo de servicios, horarios, `BOOKING_WINDOW_DAYS`. Exporta `findServiceByNombre()` (exact match) y `findServiceFuzzy()` (fuzzy match). Los nombres de servicio DEBEN coincidir con los `<option>` del `<select>` en `index.html`.
+- `config.js` — re-exporta desde `barberia.config.js` con adaptaciones para el bot (`SERVICES`, `SCHEDULE`, `TZ`, `BOOKING_WINDOW_DAYS`). Exporta `findServiceByNombre()` (exact match) y `findServiceFuzzy()` (fuzzy match).
 - `confirmaciones.js` — suscripción Supabase Realtime a INSERT en `reservas`; si `confirmacion_enviada` es false, reclama la fila (UPDATE atómico) y envía el mensaje de confirmación por WhatsApp. Al arrancar hace un startup scan de las últimas 24 h para cubrir eventos perdidos mientras el bot estuvo apagado. Notifica al admin si el teléfono es inválido o el envío falla.
 - `format.js` — `buildConfirmacion(reserva)`: genera el texto del mensaje de confirmación de turno (día de semana, DD/MM, hora, servicio, duración, precio). Hace lookup de duración/precio desde el catálogo via `findServiceByNombre()`.
 - `scheduler.js` — cron cada 15 min para recordatorios 24 h antes de la reserva.

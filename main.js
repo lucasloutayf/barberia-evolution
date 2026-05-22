@@ -164,9 +164,13 @@ initConfig()
     overlay.querySelector('.modal-box').scrollTop = 0;
 
     turnstileToken = null;
+    const container = document.getElementById('turnstileContainer');
+    container.innerHTML = '';
     if (window.turnstile) {
       widgetId = window.turnstile.render('#turnstileContainer', {
         sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+        appearance: 'always',
+        theme: 'dark',
         callback: (token) => {
           turnstileToken = token;
           errorMsg.classList.remove('show');

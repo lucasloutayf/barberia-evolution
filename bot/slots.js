@@ -100,14 +100,24 @@ export function dayOfWeekFor(fechaISO) {
   return new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay();
 }
 
+// Returns current time in the salon's TZ as minutes since midnight.
+export function currentTZMinutes() {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(new Date());
+  const h = parseInt(parts.find(p => p.type === 'hour').value, 10);
+  const m = parseInt(parts.find(p => p.type === 'minute').value, 10);
+  return h * 60 + m;
+}
+
 // Valida que `fechaISO` esté dentro del rango permitido y no sea día cerrado.
 export function validateFecha(fechaISO) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaISO || '')) {
     return { ok: false, error: 'Formato de fecha inválido. Debe ser YYYY-MM-DD.' };
   }
   const hoy = todayISO();
-  if (fechaISO <= hoy) {
-    return { ok: false, error: 'La fecha debe ser a partir de mañana.' };
+  if (fechaISO < hoy) {
+    return { ok: false, error: 'La fecha no puede ser en el pasado.' };
   }
   const [y, m, d] = hoy.split('-').map(Number);
   const maxDate = new Date(Date.UTC(y, m - 1, d + BOOKING_WINDOW_DAYS, 12));

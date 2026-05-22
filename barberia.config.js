@@ -1,7 +1,7 @@
 export default {
   barberia_id: 'evolution-spa',
   nombre: 'Evolution Spa & Peluquería',
-  direccion: 'Mariano Fragueiro 11, X5000 Córdoba',
+  direccion: 'Mariano Fragueiro 11, Córdoba',
   telefono: '3513115571',
   ubicacion: 'Córdoba capital',
 

@@ -1,5 +1,32 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const STEP = 30
+
+// Must stay in sync with barberia.config.js servicios[].nombre and duracion
+const SERVICE_DURATIONS: Record<string, number> = {
+  'Corte de cabello':     30,
+  'Tintura & Coloración': 120,
+  'Tratamientos Spa':     60,
+  'Styling & Peinados':   60,
+  'Afeitado & Barba':     30,
+  'Cuidado capilar':      45,
+}
+
+function hhmmToMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number)
+  return h * 60 + m
+}
+
+function minutesToHHMM(min: number): string {
+  return `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
+}
+
+function coversSlots(hora: string, duracion: number): string[] {
+  const n = Math.ceil(duracion / STEP)
+  const start = hhmmToMinutes(hora)
+  return Array.from({ length: n }, (_, i) => minutesToHHMM(start + i * STEP))
+}
+
 const ALLOWED_ORIGINS = new Set(
   ['http://localhost:5173', Deno.env.get('ALLOWED_ORIGIN')].filter(Boolean) as string[]
 )
@@ -115,14 +142,33 @@ Deno.serve(async (req: Request) => {
     )
   }
 
+  const duracion_min = SERVICE_DURATIONS[servicio] ?? STEP
+
+  // Collision check: prevent double-booking
+  const { data: existing } = await db
+    .from('reservas')
+    .select('hora, duracion_min, servicio')
+    .eq('fecha', fecha)
+    .neq('estado', 'cancelada')
+
+  const taken = new Set<string>()
+  for (const r of (existing ?? [])) {
+    const dur = r.duracion_min ?? SERVICE_DURATIONS[r.servicio] ?? STEP
+    for (const s of coversSlots(r.hora, dur)) taken.add(s)
+  }
+  if (coversSlots(hora, duracion_min).some(s => taken.has(s))) {
+    return json({ error: 'Ese horario ya está ocupado. Por favor elegí otro.' }, 409)
+  }
+
   // Insert reservation using service-role key (bypasses RLS)
   const { error: insertError } = await db.from('reservas').insert({
-    nombre:   nombre.trim(),
-    telefono: telefono.trim(),
+    nombre:      nombre.trim(),
+    telefono:    telefono.trim(),
     servicio,
     fecha,
     hora,
-    mensaje:  mensaje?.trim() || null,
+    mensaje:     mensaje?.trim() || null,
+    duracion_min,
     ip,
   })
 
