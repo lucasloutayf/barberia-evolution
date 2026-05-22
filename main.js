@@ -3,11 +3,8 @@ import cfg from './barberia.config.js'
 /* =====================
    CONFIG INJECTION
    ===================== */
-const [startH, startM] = cfg.horario.apertura.split(':').map(Number)
-const [endH, endM]     = cfg.horario.cierre.split(':').map(Number)
 const SLOT_INTERVAL    = cfg.horario.intervalo
 const BOOKING_WINDOW   = cfg.ventanaReservaDias
-const CLOSED_DAYS      = cfg.horario.diasCerrado
 
 function initConfig() {
   document.querySelectorAll('[data-cfg="nombre"]').forEach(el => {
@@ -45,7 +42,7 @@ initConfig()
 /* =====================
    MODAL RESERVA
    ===================== */
-(function () {
+;(function () {
   const overlay    = document.getElementById('modalReserva');
   const modalClose = document.getElementById('modalClose');
   const formWrap   = document.getElementById('modalFormWrap');
@@ -60,21 +57,25 @@ initConfig()
   let turnstileToken = null;
   let widgetId = null;
 
-  // --- Generar slots de horario ---
-  const slots = [];
-  for (let h = startH; h <= endH; h++) {
-    for (let m = 0; m < 60; m += SLOT_INTERVAL) {
-      if (h === endH && m > endM) break;
-      if (h === startH && m < startM) continue;
-      slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+  function populateSlotsForDay(dayOfWeek) {
+    horaSelect.innerHTML = '<option value="" disabled selected>Seleccioná un horario</option>';
+    const franjas = cfg.horario.dias[dayOfWeek] ?? [];
+    for (const { apertura, cierre } of franjas) {
+      const [sH, sM] = apertura.split(':').map(Number);
+      const [eH, eM] = cierre.split(':').map(Number);
+      for (let h = sH; h <= eH; h++) {
+        for (let m = (h === sH ? sM : 0); m < 60; m += SLOT_INTERVAL) {
+          if (h === eH && m > eM) break;
+          const hh = String(h).padStart(2, '0');
+          const mm = String(m).padStart(2, '0');
+          const opt = document.createElement('option');
+          opt.value = `${hh}:${mm}`;
+          opt.textContent = `${hh}:${mm} hs`;
+          horaSelect.appendChild(opt);
+        }
+      }
     }
   }
-  slots.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s;
-    opt.textContent = s + ' hs';
-    horaSelect.appendChild(opt);
-  });
 
   // --- Rango de fecha: mañana → +BOOKING_WINDOW días, sin días cerrados ---
   function setupFechaInput() {
@@ -90,10 +91,14 @@ initConfig()
 
     fechaInput.addEventListener('input', () => {
       const chosen = new Date(fechaInput.value + 'T00:00:00');
-      if (CLOSED_DAYS.includes(chosen.getDay())) {
+      const day = chosen.getDay();
+      const franjas = cfg.horario.dias[day] ?? [];
+      if (franjas.length === 0) {
         fechaInput.setCustomValidity('Estamos cerrados ese día. Por favor elegí otro día.');
+        horaSelect.innerHTML = '<option value="" disabled selected>Seleccioná un horario</option>';
       } else {
         fechaInput.setCustomValidity('');
+        populateSlotsForDay(day);
       }
     });
   }
