@@ -1382,7 +1382,33 @@ h1, h2, h3, h4 {
    ===================== */
 .contacto {
   padding: 8rem 0;
-  background: var(--ink-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.contacto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1521490323096-16c67b2827e0?w=1600&q=80&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center 20%;
+  z-index: 0;
+}
+
+.contacto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(7,6,10,.97) 0%, rgba(7,6,10,.92) 45%, rgba(7,6,10,.65) 100%),
+    linear-gradient(to top, rgba(7,6,10,.5) 0%, transparent 40%);
+  z-index: 1;
+}
+
+.contacto-inner {
+  position: relative;
+  z-index: 2;
 }
 
 .contacto-inner {
@@ -1393,10 +1419,12 @@ h1, h2, h3, h4 {
 }
 
 .contacto-info h2 {
-  font-size: clamp(2rem, 3.2vw, 3rem);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 5vw, 5rem);
   margin-bottom: 1.1rem;
-  letter-spacing: -.01em;
-  line-height: 1.15;
+  letter-spacing: .02em;
+  line-height: .92;
+  color: #fff;
 }
 
 .contacto-info > p {
