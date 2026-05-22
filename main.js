@@ -1,3 +1,44 @@
+import cfg from './barberia.config.js'
+
+/* =====================
+   CONFIG INJECTION
+   ===================== */
+const [startH, startM] = cfg.horario.apertura.split(':').map(Number)
+const [endH, endM]     = cfg.horario.cierre.split(':').map(Number)
+const SLOT_INTERVAL    = cfg.horario.intervalo
+const BOOKING_WINDOW   = cfg.ventanaReservaDias
+const CLOSED_DAYS      = cfg.horario.diasCerrado
+
+function initConfig() {
+  document.querySelectorAll('[data-cfg="nombre"]').forEach(el => {
+    el.textContent = cfg.nombre
+  })
+
+  const dir = document.getElementById('cfg-direccion')
+  if (dir) dir.textContent = cfg.direccion
+
+  const telLink = document.getElementById('cfg-tel-link')
+  if (telLink) {
+    telLink.href = `tel:${cfg.telefono}`
+    telLink.textContent = cfg.telefono
+  }
+
+  document.querySelectorAll('[data-cfg="wa-link"]').forEach(el => {
+    el.href = `https://wa.me/549${cfg.telefono}`
+  })
+  const waLinkId = document.getElementById('cfg-wa-link')
+  if (waLinkId) waLinkId.href = `https://wa.me/549${cfg.telefono}`
+
+  const select = document.getElementById('servicio')
+  if (select) {
+    select.innerHTML = cfg.servicios
+      .map(s => `<option value="${s.nombre}">${s.nombre}</option>`)
+      .join('')
+  }
+}
+
+initConfig()
+
 /* =====================
    MODAL RESERVA
    ===================== */
@@ -18,9 +59,10 @@
 
   // --- Generar slots de horario ---
   const slots = [];
-  for (let h = 9; h < 20; h++) {
-    for (let m = 0; m < 60; m += 30) {
-      if (h === 19 && m > 30) break;
+  for (let h = startH; h <= endH; h++) {
+    for (let m = 0; m < 60; m += SLOT_INTERVAL) {
+      if (h === endH && m > endM) break;
+      if (h === startH && m < startM) continue;
       slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
     }
   }
@@ -31,13 +73,13 @@
     horaSelect.appendChild(opt);
   });
 
-  // --- Rango de fecha: mañana → +45 días, sin domingos ---
+  // --- Rango de fecha: mañana → +BOOKING_WINDOW días, sin días cerrados ---
   function setupFechaInput() {
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     const maxDate = new Date(today);
-    maxDate.setDate(today.getDate() + 45);
+    maxDate.setDate(today.getDate() + BOOKING_WINDOW);
 
     const fmt = d => d.toISOString().split('T')[0];
     fechaInput.min = fmt(tomorrow);
@@ -45,8 +87,8 @@
 
     fechaInput.addEventListener('input', () => {
       const chosen = new Date(fechaInput.value + 'T00:00:00');
-      if (chosen.getDay() === 0) {
-        fechaInput.setCustomValidity('Estamos cerrados los domingos. Por favor elegí otro día.');
+      if (CLOSED_DAYS.includes(chosen.getDay())) {
+        fechaInput.setCustomValidity('Estamos cerrados ese día. Por favor elegí otro día.');
       } else {
         fechaInput.setCustomValidity('');
       }

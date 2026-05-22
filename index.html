@@ -26,7 +26,7 @@
   <canvas id="heroCanvas"></canvas>
 
   <!-- BOTÓN FLOTANTE MOBILE -->
-  <a href="tel:03513115571" class="fab" aria-label="Llamar ahora">
+  <a href="tel:3513115571" class="fab" aria-label="Llamar ahora">
     <svg viewBox="0 0 24 24" fill="currentColor">
       <path
         d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.5 11.5 0 00.57 3.6 1 1 0 01-.25 1.01l-2.2 2.18z" />
@@ -61,8 +61,8 @@
       <a href="#opiniones">Opiniones</a>
       <a href="#contacto">Contacto</a>
       <button class="btn btn-mobile open-modal" style="border:none;">Reservar turno online</button>
-      <a href="tel:03513115571" class="btn btn-mobile"
-        style="background:transparent;border:1.5px solid rgba(201,168,76,.35);color:var(--gold);">Llamar · 0351
+      <a href="tel:3513115571" class="btn btn-mobile"
+        style="background:transparent;border:1.5px solid rgba(201,168,76,.35);color:var(--gold);">Llamar · 351
         311-5571</a>
     </div>
   </nav>
@@ -120,17 +120,17 @@
   <!-- MARQUEE -->
   <div class="marquee-section" aria-hidden="true">
     <div class="marquee-track">
-      <span>Evolution Spa &amp; Peluquería</span><span class="msep">✦</span>
+      <span data-cfg="nombre">Evolution Spa &amp; Peluquería</span><span class="msep">✦</span>
       <span>Córdoba, Argentina</span><span class="msep">✦</span>
       <span>Cortes · Coloración · Tratamientos</span><span class="msep">✦</span>
       <span>Atención artesanal</span><span class="msep">✦</span>
-      <span>0351 311-5571</span><span class="msep">✦</span>
+      <span>351 311-5571</span><span class="msep">✦</span>
       <span>Desde 2019</span><span class="msep">✦</span>
-      <span>Evolution Spa &amp; Peluquería</span><span class="msep">✦</span>
+      <span data-cfg="nombre">Evolution Spa &amp; Peluquería</span><span class="msep">✦</span>
       <span>Córdoba, Argentina</span><span class="msep">✦</span>
       <span>Cortes · Coloración · Tratamientos</span><span class="msep">✦</span>
       <span>Atención artesanal</span><span class="msep">✦</span>
-      <span>0351 311-5571</span><span class="msep">✦</span>
+      <span>351 311-5571</span><span class="msep">✦</span>
       <span>Desde 2019</span><span class="msep">✦</span>
     </div>
   </div>
@@ -147,7 +147,7 @@
         </div>
         <div class="info-text">
           <strong>Dirección</strong>
-          <span>Mariano Fragueiro 11, Córdoba</span>
+          <span id="cfg-direccion">Mariano Fragueiro 11, Córdoba</span>
         </div>
       </div>
       <div class="info-item reveal">
@@ -159,7 +159,7 @@
         </div>
         <div class="info-text">
           <strong>Teléfono</strong>
-          <span>0351 311-5571</span>
+          <span>351 311-5571</span>
         </div>
       </div>
       <div class="info-item reveal">
@@ -374,7 +374,7 @@
         <span class="section-label">Quiénes somos</span>
         <h2>Pasión por el detalle, dedicación en cada corte</h2>
         <p>
-          En <strong>Evolution Spa & Peluquería</strong> creemos que el cabello es una extensión
+          En <strong data-cfg="nombre">Evolution Spa & Peluquería</strong> creemos que el cabello es una extensión
           de tu personalidad. Nuestro equipo trabaja con dedicación para que cada cliente salga
           sintiéndose su mejor versión.
         </p>
@@ -519,7 +519,7 @@
             <div class="dato-icon">◉</div>
             <div>
               <strong>Teléfono</strong>
-              <a href="tel:03513115571">0351 311-5571</a>
+              <a href="tel:3513115571" id="cfg-tel-link">351 311-5571</a>
             </div>
           </div>
           <div class="contacto-dato">
@@ -530,12 +530,12 @@
             </div>
           </div>
         </div>
-        <a href="tel:03513115571" class="btn btn-primary btn-large">
+        <a href="tel:3513115571" class="btn btn-primary btn-large">
           <svg viewBox="0 0 24 24" class="btn-icon" fill="currentColor">
             <path
               d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.5 11.5 0 00.57 3.6 1 1 0 01-.25 1.01l-2.2 2.18z" />
           </svg>
-          Llamar: 0351 311-5571
+          Llamar: 351 311-5571
         </a>
       </div>
       <div class="contacto-mapa reveal">
@@ -572,7 +572,7 @@
                   d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </a>
-            <a href="https://wa.me/5493513115571" class="social-link" aria-label="WhatsApp">
+            <a href="https://wa.me/5493513115571" class="social-link" aria-label="WhatsApp" data-cfg="wa-link">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path
                   d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -594,7 +594,7 @@
           <div class="footer-col">
             <h4>Contacto</h4>
             <ul>
-              <li><a href="tel:03513115571">0351 311-5571</a></li>
+              <li><a href="tel:3513115571">351 311-5571</a></li>
               <li><span>Mariano Fragueiro 11</span></li>
               <li><span>X5000 Córdoba, Argentina</span></li>
               <li><span>Lun – Sáb · 9 a.m. – 8 p.m.</span></li>
@@ -630,20 +630,14 @@
             </div>
             <div class="form-group">
               <label for="rf-telefono">Teléfono *</label>
-              <input type="tel" id="rf-telefono" name="telefono" placeholder="Ej: 0351 123-4567" required
+              <input type="tel" id="rf-telefono" name="telefono" placeholder="Ej: 351 123-4567" required
                 autocomplete="tel">
             </div>
           </div>
           <div class="form-group">
             <label for="rf-servicio">Servicio *</label>
-            <select id="rf-servicio" name="servicio" required>
+            <select id="servicio" name="servicio" required>
               <option value="" disabled selected>Seleccioná un servicio</option>
-              <option value="Corte de cabello">Corte de cabello</option>
-              <option value="Tintura & Coloración">Tintura &amp; Coloración</option>
-              <option value="Tratamientos Spa">Tratamientos Spa</option>
-              <option value="Styling & Peinados">Styling &amp; Peinados</option>
-              <option value="Afeitado & Barba">Afeitado &amp; Barba</option>
-              <option value="Cuidado capilar">Cuidado capilar</option>
             </select>
           </div>
           <div class="form-row">
@@ -675,7 +669,7 @@
         <div class="success-icon">&#x2713;</div>
         <h3>¡Turno solicitado!</h3>
         <p>Te contactaremos para confirmar tu reserva.<br>
-          También podés llamarnos al <a href="tel:03513115571">0351 311-5571</a>.</p>
+          También podés llamarnos al <a href="tel:3513115571">351 311-5571</a>.</p>
         <button class="btn btn-ghost" id="successClose">Cerrar</button>
       </div>
     </div>
