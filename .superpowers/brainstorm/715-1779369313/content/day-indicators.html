@@ -1,0 +1,151 @@
+<h2>¿Cómo se marcan los días con turnos?</h2>
+<p class="subtitle">Cuatro formas de indicar que un día tiene reservas. Clic en la que preferís.</p>
+
+<style>
+  .mock-cal-wrap {
+    background: #161419;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: system-ui, sans-serif;
+  }
+  .mock-cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; font-size: 12px; color: #C9A84C; font-weight: 600;
+  }
+  .mock-cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 3px; text-align: center;
+  }
+  .day-name {
+    color: #706C63; font-size: 9px; text-transform: uppercase;
+    letter-spacing: .06em; padding: 3px 0 6px;
+  }
+  .day { border-radius: 5px; padding: 5px 2px; font-size: 11px; color: #706C63; line-height: 1.2; }
+  .day.active { color: #EAE6DC; }
+  .day.today { outline: 1px solid rgba(201,168,76,.35); }
+  .day.sel { background: #C9A84C; color: #07060A; font-weight: 700; }
+  .day.empty { visibility: hidden; }
+
+  /* Style A: dot */
+  .dot-style .day.active::after {
+    content: ''; display: block;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #C9A84C; margin: 2px auto 0;
+  }
+  .dot-style .day.sel::after { background: #07060A; }
+
+  /* Style B: number */
+  .num-style .day.active .count {
+    display: block; font-size: 9px; color: #C9A84C;
+    margin-top: 1px; line-height: 1;
+  }
+  .num-style .day.sel .count { color: #07060A; }
+
+  /* Style C: color dots */
+  .colordot-style .dots {
+    display: flex; justify-content: center; gap: 2px; margin-top: 2px;
+  }
+  .colordot-style .dot-g { width: 4px; height: 4px; border-radius: 50%; background: #4ade80; }
+  .colordot-style .dot-y { width: 4px; height: 4px; border-radius: 50%; background: #fbbf24; }
+  .colordot-style .day.sel .dot-g { background: rgba(74,222,128,.6); }
+  .colordot-style .day.sel .dot-y { background: rgba(251,191,36,.6); }
+
+  /* Style D: filled cell */
+  .filled-style .day.active {
+    background: rgba(201,168,76,.12);
+    color: #EAE6DC;
+    border: 1px solid rgba(201,168,76,.2);
+  }
+  .filled-style .day.active.few { background: rgba(201,168,76,.07); }
+  .filled-style .day.active.many { background: rgba(201,168,76,.2); }
+  .filled-style .day.sel { background: #C9A84C; border-color: #C9A84C; }
+</style>
+
+<div class="cards">
+
+  <!-- A: Dot dorado -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #0E0D11;">
+      <div class="mock-cal-wrap dot-style">
+        <div class="mock-cal-header"><span>←</span><span>Mayo 2026</span><span>→</span></div>
+        <div class="mock-cal-grid">
+          <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div>
+          <div class="day active">5</div><div class="day">6</div><div class="day">7</div><div class="day active">8</div><div class="day">9</div><div class="day active">10</div><div class="day">11</div>
+          <div class="day">12</div><div class="day active">13</div><div class="day">14</div><div class="day active">15</div><div class="day active">16</div><div class="day">17</div><div class="day">18</div>
+          <div class="day">19</div><div class="day active">20</div><div class="day today">21</div><div class="day sel active">22</div><div class="day active">23</div><div class="day active">24</div><div class="day">25</div>
+          <div class="day active">26</div><div class="day">27</div><div class="day active">28</div><div class="day">29</div><div class="day">30</div><div class="day active">31</div><div class="day empty"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Punto dorado</h3>
+      <p>Un punto discreto debajo del número. Limpio y sutil. No distingue estado.</p>
+    </div>
+  </div>
+
+  <!-- B: Número de turnos -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #0E0D11;">
+      <div class="mock-cal-wrap num-style">
+        <div class="mock-cal-header"><span>←</span><span>Mayo 2026</span><span>→</span></div>
+        <div class="mock-cal-grid">
+          <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div>
+          <div class="day active">5<span class="count">2</span></div><div class="day">6</div><div class="day">7</div><div class="day active">8<span class="count">1</span></div><div class="day">9</div><div class="day active">10<span class="count">3</span></div><div class="day">11</div>
+          <div class="day">12</div><div class="day active">13<span class="count">2</span></div><div class="day">14</div><div class="day active">15<span class="count">4</span></div><div class="day active">16<span class="count">1</span></div><div class="day">17</div><div class="day">18</div>
+          <div class="day">19</div><div class="day active">20<span class="count">2</span></div><div class="day today">21</div><div class="day sel active">22<span class="count">3</span></div><div class="day active">23<span class="count">2</span></div><div class="day active">24<span class="count">1</span></div><div class="day">25</div>
+          <div class="day active">26<span class="count">3</span></div><div class="day">27</div><div class="day active">28<span class="count">2</span></div><div class="day">29</div><div class="day">30</div><div class="day active">31<span class="count">1</span></div><div class="day empty"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Contador de turnos</h3>
+      <p>Muestra cuántos turnos tiene cada día. Más informativo de un vistazo.</p>
+    </div>
+  </div>
+
+  <!-- C: Dots por estado -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #0E0D11;">
+      <div class="mock-cal-wrap colordot-style">
+        <div class="mock-cal-header"><span>←</span><span>Mayo 2026</span><span>→</span></div>
+        <div class="mock-cal-grid">
+          <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div>
+          <div class="day active">5<div class="dots"><span class="dot-g"></span><span class="dot-y"></span></div></div><div class="day">6</div><div class="day">7</div><div class="day active">8<div class="dots"><span class="dot-g"></span></div></div><div class="day">9</div><div class="day active">10<div class="dots"><span class="dot-g"></span><span class="dot-y"></span><span class="dot-g"></span></div></div><div class="day">11</div>
+          <div class="day">12</div><div class="day active">13<div class="dots"><span class="dot-y"></span><span class="dot-y"></span></div></div><div class="day">14</div><div class="day active">15<div class="dots"><span class="dot-g"></span><span class="dot-g"></span><span class="dot-y"></span></div></div><div class="day active">16<div class="dots"><span class="dot-y"></span></div></div><div class="day">17</div><div class="day">18</div>
+          <div class="day">19</div><div class="day active">20<div class="dots"><span class="dot-g"></span><span class="dot-y"></span></div></div><div class="day today">21</div><div class="day sel active">22<div class="dots"><span class="dot-g"></span><span class="dot-g"></span><span class="dot-y"></span></div></div><div class="day active">23<div class="dots"><span class="dot-y"></span><span class="dot-g"></span></div></div><div class="day active">24<div class="dots"><span class="dot-g"></span></div></div><div class="day">25</div>
+          <div class="day active">26<div class="dots"><span class="dot-g"></span><span class="dot-y"></span><span class="dot-g"></span></div></div><div class="day">27</div><div class="day active">28<div class="dots"><span class="dot-y"></span><span class="dot-y"></span></div></div><div class="day">29</div><div class="day">30</div><div class="day active">31<div class="dots"><span class="dot-g"></span></div></div><div class="day empty"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Puntos por estado</h3>
+      <p>Verde = confirmada, amarillo = pendiente. Más información visual pero puede saturar.</p>
+    </div>
+  </div>
+
+  <!-- D: Celda rellena -->
+  <div class="card" data-choice="d" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #0E0D11;">
+      <div class="mock-cal-wrap filled-style">
+        <div class="mock-cal-header"><span>←</span><span>Mayo 2026</span><span>→</span></div>
+        <div class="mock-cal-grid">
+          <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
+          <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div>
+          <div class="day active few">5</div><div class="day">6</div><div class="day">7</div><div class="day active few">8</div><div class="day">9</div><div class="day active many">10</div><div class="day">11</div>
+          <div class="day">12</div><div class="day active few">13</div><div class="day">14</div><div class="day active many">15</div><div class="day active few">16</div><div class="day">17</div><div class="day">18</div>
+          <div class="day">19</div><div class="day active few">20</div><div class="day today">21</div><div class="day sel">22</div><div class="day active few">23</div><div class="day active few">24</div><div class="day">25</div>
+          <div class="day active many">26</div><div class="day">27</div><div class="day active few">28</div><div class="day">29</div><div class="day">30</div><div class="day active few">31</div><div class="day empty"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>D — Fondo dorado tenue</h3>
+      <p>La celda entera se tinta de dorado cuando tiene turnos. Más día "ocupado", menos cuenta exacta.</p>
+    </div>
+  </div>
+
+</div>

@@ -64,16 +64,16 @@ node --test test-confirmaciones.js  # corre las pruebas de buildConfirmacion (fo
 node test-api.js                    # prueba la conexión al proveedor LLM directamente (sin bot)
 ```
 
-**Stack:** Baileys (WhatsApp) + Cerebras Qwen3 235B (MoE, ~22B activos) vía SDK de OpenAI (NLU con function calling) + Supabase service-role client + node-cron (recordatorios 24h).
+**Stack:** Baileys (WhatsApp) + OpenAI API (NLU con function calling) + Supabase service-role client + node-cron (recordatorios 24h).
 
-El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona contra cualquier proveedor que exponga `/v1/chat/completions` (Cerebras, Groq, Together, OpenAI). Para cambiar de proveedor o modelo, ajustar `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL`. Los modelos disponibles en una cuenta de Cerebras se pueden listar con: `curl -H "Authorization: Bearer $AI_API_KEY" https://api.cerebras.ai/v1/models`.
+El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona contra cualquier proveedor que exponga `/v1/chat/completions` (OpenAI, Groq, Together, etc.). Para cambiar de proveedor o modelo, ajustar `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL`.
 
 **Extra env vars** (en el `.env` raíz, junto a las `VITE_*` del frontend):
 - `SUPABASE_SERVICE_ROLE_KEY` — bypasea RLS para SELECT/UPDATE. Nunca exponer al frontend.
-- `AI_BASE_URL` — endpoint OpenAI-compatible (default: `https://api.cerebras.ai/v1`).
-- `AI_API_KEY` — API key del proveedor (Cerebras: https://cloud.cerebras.ai).
-- `AI_MODEL` — id del modelo en el proveedor (default: `qwen-3-235b-a22b-instruct-2507`).
-- `AI_MODEL_FALLBACK` — modelo alternativo si el primario devuelve 429/503 (ej: `gpt-oss-120b`).
+- `AI_BASE_URL` — endpoint OpenAI-compatible (default: `https://api.openai.com/v1`).
+- `AI_API_KEY` — API key de OpenAI.
+- `AI_MODEL` — id del modelo (ej: `gpt-4o-mini`).
+- `AI_MODEL_FALLBACK` — modelo alternativo si el primario devuelve 429/503.
 - `ADMIN_JID` — JID del WhatsApp del admin (`<numero>@s.whatsapp.net`).
 
 **Migración requerida** (correr una vez en SQL Editor de Supabase):

@@ -1,0 +1,289 @@
+<h2>¿Cómo integramos el calendario?</h2>
+<p class="subtitle">Tres formas de mostrar los turnos del mes. Hacé click en la que mejor encaja con tu flujo de trabajo.</p>
+
+<style>
+  .mock-admin {
+    background: #161419;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 12px;
+    color: #EAE6DC;
+  }
+  .mock-topbar {
+    background: #0E0D11;
+    border-bottom: 1px solid rgba(201,168,76,.15);
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #706C63;
+  }
+  .mock-topbar strong { color: #C9A84C; font-size: 12px; }
+  .mock-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .mock-stat {
+    background: #1F1D23;
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .mock-stat .num { color: #C9A84C; font-size: 18px; font-weight: 700; line-height: 1; }
+  .mock-stat .lbl { color: #706C63; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+
+  /* Calendar mini */
+  .mock-cal {
+    padding: 10px;
+  }
+  .mock-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: #C9A84C;
+    font-weight: 600;
+  }
+  .mock-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    text-align: center;
+  }
+  .mock-cal-day-name {
+    color: #706C63;
+    font-size: 9px;
+    text-transform: uppercase;
+    padding: 2px 0 4px;
+    letter-spacing: .05em;
+  }
+  .mock-cal-cell {
+    border-radius: 4px;
+    padding: 4px 2px;
+    font-size: 10px;
+    line-height: 1;
+    position: relative;
+  }
+  .mock-cal-cell.empty { opacity: 0; }
+  .mock-cal-cell.has-dot::after {
+    content: '';
+    display: block;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #C9A84C;
+    margin: 2px auto 0;
+  }
+  .mock-cal-cell.has-dot { color: #EAE6DC; }
+  .mock-cal-cell.selected {
+    background: #C9A84C;
+    color: #07060A;
+    font-weight: 700;
+  }
+  .mock-cal-cell.selected::after { background: #07060A; }
+  .mock-cal-cell.muted { color: #706C63; }
+  .mock-cal-cell.today { outline: 1px solid rgba(201,168,76,.35); border-radius: 4px; }
+
+  /* Table rows */
+  .mock-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+  .mock-table th {
+    background: #1F1D23;
+    color: #C9A84C;
+    padding: 5px 8px;
+    text-align: left;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 400;
+  }
+  .mock-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: #C8C4BA;
+  }
+  .mock-table tr:last-child td { border-bottom: none; }
+  .badge-p { background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); border-radius: 50px; padding: 1px 6px; font-size: 9px; }
+  .badge-c { background: rgba(74,222,128,.1); color: #4ade80; border: 1px solid rgba(74,222,128,.18); border-radius: 50px; padding: 1px 6px; font-size: 9px; }
+
+  /* Side panel */
+  .mock-two-col {
+    display: grid;
+    gap: 6px;
+  }
+
+  /* Detail panel */
+  .mock-detail {
+    background: #1F1D23;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .mock-detail-header {
+    color: #C9A84C;
+    font-weight: 600;
+    font-size: 11px;
+    margin-bottom: 6px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .mock-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: #C8C4BA;
+  }
+  .mock-detail-row:last-child { border-bottom: none; }
+  .mock-detail-row .time { color: #C9A84C; font-weight: 600; }
+  .mock-detail-row .name { flex: 1; margin: 0 8px; }
+  .mock-detail-row .svc { color: #706C63; font-size: 9px; }
+</style>
+
+<div class="cards">
+
+  <!-- OPCIÓN A: Calendario + tabla filtrada -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px; background: #0E0D11;">
+      <div class="mock-admin">
+        <div class="mock-topbar"><strong>E</strong>volution Admin <span>Salir</span></div>
+        <div class="mock-stats">
+          <div class="mock-stat"><div class="num">24</div><div class="lbl">Total</div></div>
+          <div class="mock-stat"><div class="num">8</div><div class="lbl">Pendientes</div></div>
+          <div class="mock-stat"><div class="num">14</div><div class="lbl">Confirmadas</div></div>
+          <div class="mock-stat"><div class="num">3</div><div class="lbl">Hoy</div></div>
+        </div>
+        <div class="mock-cal">
+          <div class="mock-cal-header">
+            <span>← </span><span>Mayo 2026</span><span> →</span>
+          </div>
+          <div class="mock-cal-grid">
+            <div class="mock-cal-day-name">L</div><div class="mock-cal-day-name">M</div><div class="mock-cal-day-name">X</div><div class="mock-cal-day-name">J</div><div class="mock-cal-day-name">V</div><div class="mock-cal-day-name">S</div><div class="mock-cal-day-name">D</div>
+            <div class="mock-cal-cell empty"></div><div class="mock-cal-cell empty"></div><div class="mock-cal-cell empty"></div><div class="mock-cal-cell muted">1</div><div class="mock-cal-cell muted">2</div><div class="mock-cal-cell muted">3</div><div class="mock-cal-cell muted">4</div>
+            <div class="mock-cal-cell muted">5</div><div class="mock-cal-cell muted">6</div><div class="mock-cal-cell muted">7</div><div class="mock-cal-cell muted">8</div><div class="mock-cal-cell muted">9</div><div class="mock-cal-cell muted">10</div><div class="mock-cal-cell muted">11</div>
+            <div class="mock-cal-cell muted">12</div><div class="mock-cal-cell muted">13</div><div class="mock-cal-cell muted">14</div><div class="mock-cal-cell muted">15</div><div class="mock-cal-cell muted">16</div><div class="mock-cal-cell muted">17</div><div class="mock-cal-cell muted">18</div>
+            <div class="mock-cal-cell muted">19</div><div class="mock-cal-cell muted">20</div><div class="mock-cal-cell today muted">21</div><div class="mock-cal-cell selected has-dot">22</div><div class="mock-cal-cell has-dot">23</div><div class="mock-cal-cell has-dot">24</div><div class="mock-cal-cell muted">25</div>
+            <div class="mock-cal-cell has-dot">26</div><div class="mock-cal-cell muted">27</div><div class="mock-cal-cell has-dot">28</div><div class="mock-cal-cell muted">29</div><div class="mock-cal-cell muted">30</div><div class="mock-cal-cell has-dot">31</div><div class="mock-cal-cell empty"></div>
+          </div>
+        </div>
+        <div style="padding: 0 6px 6px">
+          <table class="mock-table">
+            <thead><tr><th>Turno</th><th>Cliente</th><th>Servicio</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>09:00</td><td>Laura M.</td><td>Corte + Color</td><td><span class="badge-c">confirmada</span></td></tr>
+              <tr><td>11:00</td><td>Ana R.</td><td>Mechas</td><td><span class="badge-p">pendiente</span></td></tr>
+              <tr><td>15:30</td><td>Sofía L.</td><td>Peinado</td><td><span class="badge-c">confirmada</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Calendario + tabla filtrada</h3>
+      <p>El calendario reemplaza los filtros de fecha. Clic en un día → la tabla de abajo muestra solo ese día. Simple, flujo natural.</p>
+    </div>
+  </div>
+
+  <!-- OPCIÓN B: Calendario con panel lateral de detalles -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px; background: #0E0D11;">
+      <div class="mock-admin">
+        <div class="mock-topbar"><strong>E</strong>volution Admin <span>Salir</span></div>
+        <div class="mock-stats">
+          <div class="mock-stat"><div class="num">24</div><div class="lbl">Total</div></div>
+          <div class="mock-stat"><div class="num">8</div><div class="lbl">Pendientes</div></div>
+          <div class="mock-stat"><div class="num">14</div><div class="lbl">Confirmadas</div></div>
+          <div class="mock-stat"><div class="num">3</div><div class="lbl">Hoy</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px;">
+          <div>
+            <div class="mock-cal">
+              <div class="mock-cal-header">
+                <span>← </span><span>Mayo 2026</span><span> →</span>
+              </div>
+              <div class="mock-cal-grid">
+                <div class="mock-cal-day-name">L</div><div class="mock-cal-day-name">M</div><div class="mock-cal-day-name">X</div><div class="mock-cal-day-name">J</div><div class="mock-cal-day-name">V</div><div class="mock-cal-day-name">S</div><div class="mock-cal-day-name">D</div>
+                <div class="mock-cal-cell empty"></div><div class="mock-cal-cell empty"></div><div class="mock-cal-cell empty"></div><div class="mock-cal-cell muted">1</div><div class="mock-cal-cell muted">2</div><div class="mock-cal-cell muted">3</div><div class="mock-cal-cell muted">4</div>
+                <div class="mock-cal-cell muted">5</div><div class="mock-cal-cell muted">6</div><div class="mock-cal-cell muted">7</div><div class="mock-cal-cell muted">8</div><div class="mock-cal-cell muted">9</div><div class="mock-cal-cell muted">10</div><div class="mock-cal-cell muted">11</div>
+                <div class="mock-cal-cell muted">12</div><div class="mock-cal-cell muted">13</div><div class="mock-cal-cell muted">14</div><div class="mock-cal-cell muted">15</div><div class="mock-cal-cell muted">16</div><div class="mock-cal-cell muted">17</div><div class="mock-cal-cell muted">18</div>
+                <div class="mock-cal-cell muted">19</div><div class="mock-cal-cell muted">20</div><div class="mock-cal-cell today muted">21</div><div class="mock-cal-cell selected has-dot">22</div><div class="mock-cal-cell has-dot">23</div><div class="mock-cal-cell has-dot">24</div><div class="mock-cal-cell muted">25</div>
+                <div class="mock-cal-cell has-dot">26</div><div class="mock-cal-cell muted">27</div><div class="mock-cal-cell has-dot">28</div><div class="mock-cal-cell muted">29</div><div class="mock-cal-cell muted">30</div><div class="mock-cal-cell has-dot">31</div><div class="mock-cal-cell empty"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-detail">
+            <div class="mock-detail-header">Jueves 22 mayo — 3 turnos</div>
+            <div class="mock-detail-row"><span class="time">09:00</span><span class="name">Laura M.</span><span class="svc">Corte + Color</span></div>
+            <div class="mock-detail-row"><span class="time">11:00</span><span class="name">Ana R.</span><span class="svc">Mechas</span></div>
+            <div class="mock-detail-row"><span class="time">15:30</span><span class="name">Sofía L.</span><span class="svc">Peinado</span></div>
+          </div>
+        </div>
+        <div style="padding: 0 6px 6px">
+          <table class="mock-table">
+            <thead><tr><th>Turno</th><th>Cliente</th><th>Servicio</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>09:00</td><td>Laura M.</td><td>Corte</td><td><span class="badge-c">confirmada</span></td></tr>
+              <tr><td>14:00</td><td>Carlos G.</td><td>Barba</td><td><span class="badge-p">pendiente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Calendario + panel lateral</h3>
+      <p>Al lado del calendario, un panel muestra los turnos del día seleccionado. La tabla completa sigue abajo con todos los turnos.</p>
+    </div>
+  </div>
+
+  <!-- OPCIÓN C: Sección colapsable -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px; background: #0E0D11;">
+      <div class="mock-admin">
+        <div class="mock-topbar"><strong>E</strong>volution Admin <span>Salir</span></div>
+        <div class="mock-stats">
+          <div class="mock-stat"><div class="num">24</div><div class="lbl">Total</div></div>
+          <div class="mock-stat"><div class="num">8</div><div class="lbl">Pendientes</div></div>
+          <div class="mock-stat"><div class="num">14</div><div class="lbl">Confirmadas</div></div>
+          <div class="mock-stat"><div class="num">3</div><div class="lbl">Hoy</div></div>
+        </div>
+        <!-- Toggle bar -->
+        <div style="padding: 8px 10px; display: flex; gap: 6px;">
+          <div style="flex:1; background:#1F1D23; border:1px solid rgba(201,168,76,.3); border-radius:6px; padding:5px 10px; font-size:10px; color:#C9A84C; text-align:center; font-weight:600;">📅 Calendario</div>
+          <div style="flex:1; background:#161419; border:1px solid rgba(255,255,255,.06); border-radius:6px; padding:5px 10px; font-size:10px; color:#706C63; text-align:center;">☰ Lista</div>
+        </div>
+        <div class="mock-cal" style="padding: 6px 10px 10px;">
+          <div class="mock-cal-header">
+            <span>← </span><span>Mayo 2026</span><span> →</span>
+          </div>
+          <div class="mock-cal-grid">
+            <div class="mock-cal-day-name">L</div><div class="mock-cal-day-name">M</div><div class="mock-cal-day-name">X</div><div class="mock-cal-day-name">J</div><div class="mock-cal-day-name">V</div><div class="mock-cal-day-name">S</div><div class="mock-cal-day-name">D</div>
+            <div class="mock-cal-cell empty"></div><div class="mock-cal-cell empty"></div><div class="mock-cal-cell empty"></div><div class="mock-cal-cell muted">1</div><div class="mock-cal-cell muted">2</div><div class="mock-cal-cell muted">3</div><div class="mock-cal-cell muted">4</div>
+            <div class="mock-cal-cell muted">5</div><div class="mock-cal-cell muted">6</div><div class="mock-cal-cell muted">7</div><div class="mock-cal-cell muted">8</div><div class="mock-cal-cell muted">9</div><div class="mock-cal-cell muted">10</div><div class="mock-cal-cell muted">11</div>
+            <div class="mock-cal-cell muted">12</div><div class="mock-cal-cell muted">13</div><div class="mock-cal-cell muted">14</div><div class="mock-cal-cell muted">15</div><div class="mock-cal-cell muted">16</div><div class="mock-cal-cell muted">17</div><div class="mock-cal-cell muted">18</div>
+            <div class="mock-cal-cell muted">19</div><div class="mock-cal-cell muted">20</div><div class="mock-cal-cell today muted">21</div><div class="mock-cal-cell selected has-dot">22</div><div class="mock-cal-cell has-dot">23</div><div class="mock-cal-cell has-dot">24</div><div class="mock-cal-cell muted">25</div>
+            <div class="mock-cal-cell has-dot">26</div><div class="mock-cal-cell muted">27</div><div class="mock-cal-cell has-dot">28</div><div class="mock-cal-cell muted">29</div><div class="mock-cal-cell muted">30</div><div class="mock-cal-cell has-dot">31</div><div class="mock-cal-cell empty"></div>
+          </div>
+          <div class="mock-detail" style="margin-top:6px;">
+            <div class="mock-detail-header">Jueves 22 mayo — 3 turnos</div>
+            <div class="mock-detail-row"><span class="time">09:00</span><span class="name">Laura M.</span><span class="svc">Corte + Color</span></div>
+            <div class="mock-detail-row"><span class="time">11:00</span><span class="name">Ana R.</span><span class="svc">Mechas</span></div>
+            <div class="mock-detail-row"><span class="time">15:30</span><span class="name">Sofía L.</span><span class="svc">Peinado</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Vista de Calendario / Lista (tabs)</h3>
+      <p>Dos tabs: "Calendario" (mes + detalle del día al clic) y "Lista" (la tabla actual). Mantiene el panel limpio — elegís qué ver.</p>
+    </div>
+  </div>
+
+</div>
