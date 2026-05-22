@@ -17,14 +17,14 @@ import pino from 'pino';
 import { handleMessage, ProviderBusyError } from './agent.js';
 import { setRealJid } from './state.js';
 import * as guard from './guard.js';
-import { BUSINESS_HOURS, TZ } from './config.js';
+import { TZ, horasForDay, isClosedDay, formatHorario } from './config.js';
 
 function isWithinBusinessHours() {
   const local = new Date(new Date().toLocaleString('en-US', { timeZone: TZ }));
   const day = local.getDay();
-  if (BUSINESS_HOURS.closedDays.includes(day)) return false;
+  if (isClosedDay(day)) return false;
   const hhmm = `${String(local.getHours()).padStart(2, '0')}:${String(local.getMinutes()).padStart(2, '0')}`;
-  return hhmm >= BUSINESS_HOURS.start && hhmm <= BUSINESS_HOURS.end;
+  return horasForDay(day).some(f => hhmm >= f.apertura && hhmm <= f.cierre);
 }
 
 const CLOSED_COOLDOWN_MS = 60 * 60 * 1000; // 1 hora
@@ -192,7 +192,7 @@ export async function connectToWhatsApp() {
         if (Date.now() - lastNotified > CLOSED_COOLDOWN_MS) {
           closedNotifiedAt.set(from, Date.now());
           await sock.sendMessage(from, {
-            text: 'El salón está cerrado en este momento 🌙\nNuestro horario es lunes a sábado de 9:00 a 19:30 hs.\n¡Escribinos en horario y te atendemos enseguida!',
+            text: `El salón está cerrado en este momento 🌙\nNuestro horario:\n${formatHorario()}\n¡Escribinos en horario y te atendemos enseguida!`,
           }).catch(() => {});
         }
         guard.queueDecrement(from);
