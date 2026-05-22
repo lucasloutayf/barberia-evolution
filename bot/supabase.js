@@ -2,6 +2,7 @@
 // IMPORTANTE: nunca exponer este cliente al frontend.
 
 import { createClient } from '@supabase/supabase-js';
+import cfg from '../barberia.config.js';
 
 const url = process.env.VITE_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -22,6 +23,7 @@ export async function listByFecha(fecha) {
   const { data, error } = await sb
     .from(TABLE)
     .select('*')
+    .eq('barberia_id', cfg.barberia_id)
     .eq('fecha', fecha)
     .order('hora', { ascending: true });
   if (error) throw error;
@@ -32,6 +34,7 @@ export async function listActivasByFecha(fecha) {
   const { data, error } = await sb
     .from(TABLE)
     .select('*')
+    .eq('barberia_id', cfg.barberia_id)
     .eq('fecha', fecha)
     .neq('estado', 'cancelada')
     .order('hora', { ascending: true });
@@ -47,10 +50,15 @@ export async function findById(id) {
 
 export async function findFuturasByTelefono(telefono) {
   const hoy = new Date().toISOString().slice(0, 10);
+  // Busca ambas variantes: con prefijo argentino "549..." y sin él, para
+  // cubrir reservas hechas desde la web (sin prefijo) vs. el bot (con 549).
+  const base = telefono.replace(/^\+?549?/, '');
+  const variants = [...new Set([telefono, `549${base}`, base])];
   const { data, error } = await sb
     .from(TABLE)
     .select('*')
-    .eq('telefono', telefono)
+    .eq('barberia_id', cfg.barberia_id)
+    .in('telefono', variants)
     .neq('estado', 'cancelada')
     .gte('fecha', hoy)
     .order('fecha', { ascending: true })
@@ -60,7 +68,7 @@ export async function findFuturasByTelefono(telefono) {
 }
 
 export async function insertReserva(row) {
-  const { data, error } = await sb.from(TABLE).insert(row).select('*').single();
+  const { data, error } = await sb.from(TABLE).insert({ ...row, barberia_id: cfg.barberia_id }).select('*').single();
   if (error) throw error;
   return data;
 }
@@ -82,6 +90,7 @@ export async function pendingReminders(fechaIni, fechaFin) {
   const { data, error } = await sb
     .from(TABLE)
     .select('*')
+    .eq('barberia_id', cfg.barberia_id)
     .neq('estado', 'cancelada')
     .eq('recordatorio_enviado', false)
     .gte('fecha', fechaIni)
@@ -117,6 +126,7 @@ export async function pendingConfirmaciones() {
   const { data, error } = await sb
     .from(TABLE)
     .select('*')
+    .eq('barberia_id', cfg.barberia_id)
     .eq('confirmacion_enviada', false)
     .gte('created_at', cutoff);
   if (error) throw error;
