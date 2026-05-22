@@ -23,11 +23,14 @@ function initConfig() {
     telLink.textContent = cfg.telefono
   }
 
+  document.querySelectorAll('[data-cfg="tel-link"]').forEach(el => {
+    el.href = `tel:${cfg.telefono}`
+    if (el.textContent.trim() === '3513115571') el.textContent = cfg.telefono
+  })
+
   document.querySelectorAll('[data-cfg="wa-link"]').forEach(el => {
     el.href = `https://wa.me/549${cfg.telefono}`
   })
-  const waLinkId = document.getElementById('cfg-wa-link')
-  if (waLinkId) waLinkId.href = `https://wa.me/549${cfg.telefono}`
 
   const select = document.getElementById('servicio')
   if (select) {
@@ -196,6 +199,7 @@ initConfig()
       fecha:          form.fecha.value,
       hora:           form.hora.value,
       mensaje:        form.mensaje.value.trim() || null,
+      barberia_id:    cfg.barberia_id,
       turnstileToken,
     };
 

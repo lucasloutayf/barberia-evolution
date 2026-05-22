@@ -223,7 +223,7 @@ async function updateEstado(id, estado) {
   if (row) row.style.opacity = '.45';
 
   try {
-    const { error } = await getDb().from('reservas').update({ estado }).eq('id', id);
+    const { error } = await getDb().from('reservas').update({ estado }).eq('id', id).eq('barberia_id', BARBERIA_ID);
     if (error) throw error;
     const r = allReservas.find(r => r.id === id);
     if (r) r.estado = estado;
@@ -239,7 +239,7 @@ async function deleteReserva(id, btn) {
   btn.disabled = true;
 
   try {
-    const { error } = await getDb().from('reservas').delete().eq('id', id);
+    const { error } = await getDb().from('reservas').delete().eq('id', id).eq('barberia_id', BARBERIA_ID);
     if (error) throw error;
     allReservas = allReservas.filter(r => r.id !== id);
     updateStats();

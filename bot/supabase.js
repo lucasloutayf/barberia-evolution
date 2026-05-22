@@ -43,7 +43,7 @@ export async function listActivasByFecha(fecha) {
 }
 
 export async function findById(id) {
-  const { data, error } = await sb.from(TABLE).select('*').eq('id', id).maybeSingle();
+  const { data, error } = await sb.from(TABLE).select('*').eq('id', id).eq('barberia_id', cfg.barberia_id).maybeSingle();
   if (error) throw error;
   return data;
 }
