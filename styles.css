@@ -1101,100 +1101,31 @@ h1, h2, h3, h4 {
 
 .nosotros-visual {
   position: relative;
-  display: flex;
-  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  min-height: 480px;
 }
 
-.nosotros-art {
-  position: relative;
-  width: 420px;
-  height: 480px;
-  flex-shrink: 0;
-}
-
-.art-circle {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(201,168,76,.12);
-}
-
-.art-c1 {
-  width: 380px; height: 380px;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle at 32% 32%, rgba(201,168,76,.07), transparent 58%);
-  animation: rotateSlow 28s linear infinite;
-}
-.art-c2 {
-  width: 260px; height: 260px;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  border-color: rgba(201,168,76,.08);
-  animation: rotateSlow 20s linear infinite reverse;
-}
-.art-c3 {
-  width: 140px; height: 140px;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  border-color: rgba(201,168,76,.18);
-  background: rgba(201,168,76,.035);
-}
-
-.art-lines {
+.nosotros-photo-wrap {
+  width: 100%;
+  height: 100%;
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.art-line {
+.nosotros-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  filter: brightness(.82) contrast(1.05) saturate(.88);
+}
+
+.nosotros-photo-overlay {
   position: absolute;
-  width: 100%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,.1), transparent);
-  transform-origin: center;
-}
-.art-line:nth-child(1) { transform: rotate(0deg); }
-.art-line:nth-child(2) { transform: rotate(60deg); }
-.art-line:nth-child(3) { transform: rotate(120deg); }
-
-.art-glyph {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 5rem;
-  color: var(--gold);
-  opacity: .14;
-  animation: floatSlow 8s ease-in-out infinite;
-}
-
-.art-badge {
-  position: absolute;
-  bottom: 1.75rem; right: -1rem;
-  background: var(--gold);
-  color: var(--ink);
-  border-radius: var(--r-md);
-  padding: 1.25rem 1.6rem;
-  text-align: center;
-  box-shadow: var(--shadow-gold);
-}
-
-.badge-year {
-  font-family: 'Cormorant Garant', serif;
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -.04em;
-}
-
-.badge-text {
-  font-family: 'Syne', sans-serif;
-  font-size: .62rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  line-height: 1.5;
-  text-transform: uppercase;
-  margin-top: .25rem;
+  inset: 0;
+  background: linear-gradient(to right, transparent 60%, rgba(7,6,10,.95) 100%);
 }
 
 .nosotros-content h2 {
