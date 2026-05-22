@@ -4,7 +4,7 @@
 import { SERVICES, findServiceByNombre, findServiceFuzzy } from './config.js';
 import {
   generateAllSlots, slotsForService, hasCollision,
-  validateFecha, validateHora,
+  validateFecha, validateHora, dayOfWeekFor,
 } from './slots.js';
 import {
   listActivasByFecha, insertReserva, updateReserva, cancelReserva,
@@ -32,8 +32,9 @@ export async function consultar_disponibilidad({ fecha, servicio }) {
   const svc = findServiceByNombre(servicio) || findServiceFuzzy(servicio);
   if (!svc) return { ok: false, error: `Servicio "${servicio}" no encontrado. Servicios válidos: ${SERVICES.map(s => s.nombre).join(', ')}.` };
 
+  const dayOfWeek = dayOfWeekFor(fecha);
   const reservas = await listActivasByFecha(fecha);
-  const horarios = slotsForService(svc.duracion_min, reservas);
+  const horarios = slotsForService(svc.duracion_min, reservas, dayOfWeek);
   return {
     ok: true,
     data: {
@@ -41,7 +42,7 @@ export async function consultar_disponibilidad({ fecha, servicio }) {
       servicio: svc.nombre,
       duracion_min: svc.duracion_min,
       horarios_disponibles: horarios,
-      total_horarios_dia: generateAllSlots().length,
+      total_horarios_dia: generateAllSlots(dayOfWeek).length,
     },
   };
 }
@@ -52,7 +53,8 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
 
   const vf = validateFecha(fecha);
   if (!vf.ok) return { ok: false, error: vf.error };
-  const vh = validateHora(hora);
+  const dayOfWeek = dayOfWeekFor(fecha);
+  const vh = validateHora(hora, dayOfWeek);
   if (!vh.ok) return { ok: false, error: vh.error };
 
   const svc = findServiceByNombre(servicio) || findServiceFuzzy(servicio);
@@ -60,7 +62,7 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
 
   const reservas = await listActivasByFecha(fecha);
   if (hasCollision(hora, svc.duracion_min, reservas)) {
-    const disponibles = slotsForService(svc.duracion_min, reservas);
+    const disponibles = slotsForService(svc.duracion_min, reservas, dayOfWeek);
     return {
       ok: false,
       error: `El horario ${hora} no está disponible para ${svc.nombre} (${svc.duracion_min} min). Horarios libres: ${disponibles.slice(0, 8).join(', ') || 'ninguno este día'}.`,
@@ -118,13 +120,14 @@ export async function modificar_reserva({ id, nueva_fecha, nueva_hora }) {
 
   const vf = validateFecha(fecha);
   if (!vf.ok) return { ok: false, error: vf.error };
-  const vh = validateHora(hora);
+  const dayOfWeek = dayOfWeekFor(fecha);
+  const vh = validateHora(hora, dayOfWeek);
   if (!vh.ok) return { ok: false, error: vh.error };
 
   const duracion = actual.duracion_min || 30;
   const reservas = await listActivasByFecha(fecha);
   if (hasCollision(hora, duracion, reservas, id)) {
-    const disponibles = slotsForService(duracion, reservas);
+    const disponibles = slotsForService(duracion, reservas, dayOfWeek);
     return { ok: false, error: `${hora} no está disponible. Libres: ${disponibles.slice(0, 8).join(', ') || 'ninguno'}.` };
   }
 
