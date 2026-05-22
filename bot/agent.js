@@ -2,7 +2,7 @@
 // API estilo OpenAI (tools = [{ type: 'function', function: {...} }]).
 
 import OpenAI from 'openai';
-import { SERVICES, BOOKING_WINDOW_DAYS, BUSINESS_HOURS, TZ } from './config.js';
+import { SERVICES, BOOKING_WINDOW_DAYS, SCHEDULE, TZ, formatHorario } from './config.js';
 import { todayISO } from './slots.js';
 import { FUNCTION_DECLARATIONS, TOOL_HANDLERS } from './tools.js';
 import {
@@ -45,8 +45,9 @@ Si alguien te pregunta si sos un bot o una IA, decís que no, que sos la recepci
 Lo que ofrecemos:
 ${catalogoTxt}
 
-Horario: lunes a sábado de ${BUSINESS_HOURS.start} a ${BUSINESS_HOURS.end} hs. Los domingos cerramos.
-Los turnos son cada ${BUSINESS_HOURS.stepMin} minutos. Se puede reservar desde mañana hasta ${BOOKING_WINDOW_DAYS} días adelante.
+Horario:
+${formatHorario()}
+Los turnos son cada ${SCHEDULE.stepMin} minutos. Se puede reservar desde mañana hasta ${BOOKING_WINDOW_DAYS} días adelante.
 Hoy es ${todayISO()} (Argentina, ${TZ}).
 
 ${telefonoInfo}
