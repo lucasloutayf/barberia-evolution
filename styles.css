@@ -919,6 +919,17 @@ h1, h2, h3, h4 {
 
 /* Keep sweep element, just visually simplified */
 .card-border-sweep { display: none; }
+.card-bg-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity .5s var(--ease);
+  z-index: 0;
+  border-radius: inherit;
+}
+.servicio-card:hover .card-bg-photo { opacity: .1; }
 
 /* =====================
    GALERÍA
