@@ -4,19 +4,13 @@
 
 import cfg from '../barberia.config.js';
 
-function deriveId(nombre) {
-  return nombre.toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')  // strip accents
-    .split(/\s+/)[0];  // first word
-}
-
 export const TZ = cfg.horario.timezone;
 
 export const SERVICES = cfg.servicios.map(s => ({
-  id:          deriveId(s.nombre),
-  nombre:      s.nombre,
+  id:           s.id,
+  nombre:       s.nombre,
   duracion_min: s.duracion,
-  precio:      s.precio,
+  precio:       s.precio,
 }));
 
 export const BUSINESS_HOURS = {
