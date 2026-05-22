@@ -31,9 +31,9 @@ function initConfig() {
 
   const select = document.getElementById('servicio')
   if (select) {
-    select.innerHTML = cfg.servicios
-      .map(s => `<option value="${s.nombre}">${s.nombre}</option>`)
-      .join('')
+    select.innerHTML =
+      '<option value="" disabled selected>Seleccioná un servicio</option>' +
+      cfg.servicios.map(s => `<option value="${s.nombre}">${s.nombre}</option>`).join('')
   }
 }
 
