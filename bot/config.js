@@ -1,28 +1,32 @@
-// Catálogo y reglas del salón. Editar precios/duraciones cuando el usuario los provea.
+// Catálogo y reglas del salón — leídos desde barberia.config.js (fuente única de verdad).
 // Los `nombre` de SERVICES deben coincidir EXACTAMENTE con los <option> del <select>
 // en index.html (rf-servicio) para que el panel admin del sitio los muestre consistentes.
 
-export const TZ = 'America/Argentina/Buenos_Aires';
+import cfg from '../barberia.config.js';
 
-export const SERVICES = [
-  { id: 'corte',     nombre: 'Corte de cabello',     duracion_min: 30,  precio: 5000  },
-  { id: 'tintura',   nombre: 'Tintura & Coloración', duracion_min: 120, precio: 18000 },
-  { id: 'spa',       nombre: 'Tratamientos Spa',     duracion_min: 60,  precio: 12000 },
-  { id: 'styling',   nombre: 'Styling & Peinados',   duracion_min: 60,  precio: 9000  },
-  { id: 'afeitado',  nombre: 'Afeitado & Barba',     duracion_min: 30,  precio: 4000  },
-  { id: 'cuidado',   nombre: 'Cuidado capilar',      duracion_min: 45,  precio: 8000  },
-];
+function deriveId(nombre) {
+  return nombre.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')  // strip accents
+    .split(/\s+/)[0];  // first word
+}
 
-// TODO ajustar: precios y duraciones placeholder hasta que el usuario los confirme.
+export const TZ = cfg.horario.timezone;
+
+export const SERVICES = cfg.servicios.map(s => ({
+  id:          deriveId(s.nombre),
+  nombre:      s.nombre,
+  duracion_min: s.duracion,
+  precio:      s.precio,
+}));
 
 export const BUSINESS_HOURS = {
-  start: '09:00',
-  end:   '19:30',       // último horario de INICIO permitido
-  stepMin: 30,
-  closedDays: [0],      // 0 = Domingo (getDay)
+  start:       cfg.horario.apertura,
+  end:         cfg.horario.cierre,
+  stepMin:     cfg.horario.intervalo,
+  closedDays:  cfg.horario.diasCerrado,
 };
 
-export const BOOKING_WINDOW_DAYS = 45;
+export const BOOKING_WINDOW_DAYS = cfg.ventanaReservaDias;
 
 export const ADMIN_JID = process.env.ADMIN_JID || '';
 
