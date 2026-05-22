@@ -4,6 +4,7 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 let db = null;
+let BARBERIA_ID = null;
 
 function getDb() {
   if (!db) {
@@ -52,7 +53,16 @@ async function handleLogin() {
   }
 }
 
-function showDashboard() {
+async function showDashboard() {
+  const { data: { user } } = await getDb().auth.getUser()
+  BARBERIA_ID = user?.user_metadata?.barberia_id ?? null
+
+  if (!BARBERIA_ID) {
+    alert('Este usuario no tiene una barbería asignada. Contactá al administrador.')
+    await getDb().auth.signOut()
+    return
+  }
+
   hide('loginScreen');
   show('dashboard');
 
@@ -116,6 +126,7 @@ async function loadReservas() {
     const { data, error } = await getDb()
       .from('reservas')
       .select('*')
+      .eq('barberia_id', BARBERIA_ID)
       .order('created_at', { ascending: false });
 
     loading.style.display = 'none';
