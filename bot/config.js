@@ -1,7 +1,3 @@
-// Catálogo y reglas del salón — leídos desde barberia.config.js (fuente única de verdad).
-// Los `nombre` de SERVICES deben coincidir EXACTAMENTE con los <option> del <select>
-// en index.html (rf-servicio) para que el panel admin del sitio los muestre consistentes.
-
 import cfg from '../barberia.config.js';
 
 export const TZ = cfg.horario.timezone;
@@ -13,12 +9,30 @@ export const SERVICES = cfg.servicios.map(s => ({
   precio:       s.precio,
 }));
 
-export const BUSINESS_HOURS = {
-  start:       cfg.horario.apertura,
-  end:         cfg.horario.cierre,
-  stepMin:     cfg.horario.intervalo,
-  closedDays:  cfg.horario.diasCerrado,
+export const SCHEDULE = {
+  dias:    cfg.horario.dias,
+  stepMin: cfg.horario.intervalo,
 };
+
+export function horasForDay(dayOfWeek) {
+  return SCHEDULE.dias[dayOfWeek] ?? [];
+}
+
+export function isClosedDay(dayOfWeek) {
+  return horasForDay(dayOfWeek).length === 0;
+}
+
+const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+export function formatHorario() {
+  return SCHEDULE.dias
+    .map((franjas, i) => {
+      if (franjas.length === 0) return `- ${DAY_NAMES[i]}: cerrado`;
+      const rango = franjas.map(f => `${f.apertura} a ${f.cierre}`).join(' y ');
+      return `- ${DAY_NAMES[i]}: ${rango}`;
+    })
+    .join('\n');
+}
 
 export const BOOKING_WINDOW_DAYS = cfg.ventanaReservaDias;
 
