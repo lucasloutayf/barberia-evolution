@@ -10,11 +10,17 @@ export default {
   },
 
   horario: {
-    apertura:     '09:00',
-    cierre:       '19:30',
     intervalo:    30,
-    diasCerrado:  [0],
     timezone:     'America/Argentina/Buenos_Aires',
+    dias: [
+      [],                                               // 0 Dom — cerrado
+      [{ apertura: '09:00', cierre: '19:30' }],        // 1 Lun
+      [{ apertura: '09:00', cierre: '19:30' }],        // 2 Mar
+      [{ apertura: '09:00', cierre: '19:30' }],        // 3 Mié
+      [{ apertura: '09:00', cierre: '19:30' }],        // 4 Jue
+      [{ apertura: '09:00', cierre: '19:30' }],        // 5 Vie
+      [{ apertura: '09:00', cierre: '19:30' }],        // 6 Sáb
+    ],
   },
 
   ventanaReservaDias: 45,
