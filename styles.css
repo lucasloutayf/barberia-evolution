@@ -1829,7 +1829,6 @@ h1, h2, h3, h4 {
 @media (max-width: 1024px) {
   .info-band-inner { grid-template-columns: repeat(2, 1fr); }
   .nosotros-inner { gap: 3rem; }
-  .art-badge { right: 0; }
   .proceso-timeline { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
   .proceso-timeline::before { display: none; }
   .step-connector { display: none; }
