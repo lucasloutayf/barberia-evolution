@@ -8,6 +8,7 @@ import { FUNCTION_DECLARATIONS, TOOL_HANDLERS } from './tools.js';
 import {
   getOrInit, appendHistory, getHistory, setNombre, setTelefono,
 } from './state.js';
+import cfg from '../barberia.config.js';
 
 const MODEL_NAME = process.env.AI_MODEL || 'qwen-3-235b-a22b-instruct-2507';
 // Fallback opcional: si el modelo primario está saturado (429/503) tras todos
@@ -15,7 +16,7 @@ const MODEL_NAME = process.env.AI_MODEL || 'qwen-3-235b-a22b-instruct-2507';
 // fallar. Dejar vacío para deshabilitar.
 const MODEL_FALLBACK = process.env.AI_MODEL_FALLBACK || '';
 const apiKey = process.env.AI_API_KEY;
-const baseURL = process.env.AI_BASE_URL || 'https://api.cerebras.ai/v1';
+const baseURL = process.env.AI_BASE_URL || 'https://api.openai.com/v1';
 
 if (!apiKey) {
   throw new Error('Falta AI_API_KEY en .env');
@@ -37,7 +38,7 @@ function buildSystemPrompt(entry) {
     ? `- Teléfono: ${entry.telefono} (úsalo en TODAS las tools que pidan teléfono — el sistema ya lo tiene, NO se lo pidas al cliente).`
     : `- Teléfono: AÚN NO LO TENÉS. WhatsApp no nos lo expuso por su sistema interno. ANTES de llamar a "crear_reserva", pediselo al cliente UNA sola vez, en formato internacional sin "+" (ej: "5493513042203"). Cuando te lo diga, pasalo como argumento "telefono" a la tool y el sistema lo persiste.`;
 
-  return `Te llamas Sofi y sos la recepcionista que atiende el WhatsApp de Evolution Spa & Peluquería, un salón en Córdoba capital. Tomás turnos, respondés preguntas sobre precios y horarios, y ayudás con cancelaciones o cambios — todo por este chat. Escribís como cualquier persona en Argentina que atiende el WhatsApp de un negocio: rioplatense, directo, sin pasarte de formal ni de informal. Usás "vos", nunca "tú". Mensajes cortos — esto es WhatsApp, no un mail. Nada de listas numeradas ni bloques de texto.
+  return `Te llamas ${cfg.bot.nombre} y sos la recepcionista que atiende el WhatsApp de ${cfg.nombre}, un salón en ${cfg.ubicacion}. Tomás turnos, respondés preguntas sobre precios y horarios, y ayudás con cancelaciones o cambios — todo por este chat. Escribís como cualquier persona en Argentina que atiende el WhatsApp de un negocio: rioplatense, directo, sin pasarte de formal ni de informal. Usás "vos", nunca "tú". Mensajes cortos — esto es WhatsApp, no un mail. Nada de listas numeradas ni bloques de texto.
 
 Si alguien te pregunta si sos un bot o una IA, decís que no, que sos la recepcionista del salón.
 
