@@ -281,11 +281,28 @@
       <div class="galeria-grid">
         <!-- Item grande — tendrá el slider before/after en Task 7 -->
         <div class="galeria-item galeria-item--large reveal" id="galeriaSlider">
-          <img
-            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&h=600&q=85&auto=format&fit=crop"
-            alt="Transformación en Evolution Spa"
-            loading="lazy"
-          >
+          <div class="ba-slider" role="img" aria-label="Comparación antes y después de corte de cabello">
+            <div class="ba-before">
+              <img
+                src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&h=600&q=85&auto=format&fit=crop"
+                alt="Antes"
+                draggable="false"
+              >
+              <span class="ba-label ba-label--before">Antes</span>
+            </div>
+            <div class="ba-after">
+              <img
+                src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=900&h=600&q=85&auto=format&fit=crop"
+                alt="Después"
+                draggable="false"
+              >
+              <span class="ba-label ba-label--after">Después</span>
+            </div>
+            <div class="ba-slider-handle" aria-hidden="true">
+              <div class="ba-slider-line"></div>
+              <div class="ba-slider-btn">◈</div>
+            </div>
+          </div>
         </div>
         <div class="galeria-item reveal">
           <img

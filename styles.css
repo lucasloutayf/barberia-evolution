@@ -977,6 +977,105 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
+/* Before/After Slider */
+.ba-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+
+.ba-before,
+.ba-after {
+  position: absolute;
+  inset: 0;
+}
+
+.ba-before img,
+.ba-after img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+  filter: brightness(.88) saturate(.88);
+}
+
+.ba-after {
+  clip-path: inset(0 50% 0 0);
+}
+
+.ba-label {
+  position: absolute;
+  top: .85rem;
+  z-index: 3;
+  font-family: 'Syne', sans-serif;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: rgba(7,6,10,.6);
+  padding: .22rem .75rem;
+  border-radius: 50px;
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+.ba-label--before { left: .85rem; }
+.ba-label--after  { right: .85rem; }
+
+.ba-slider-handle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 100%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: ew-resize;
+}
+
+.ba-slider-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--gold) 15%, var(--gold) 85%, transparent);
+}
+
+.ba-slider-btn {
+  width: 38px;
+  height: 38px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  position: relative;
+  z-index: 5;
+  transition: transform .2s var(--ease-spring), box-shadow .2s;
+}
+.ba-slider:active .ba-slider-btn,
+.ba-slider-handle:hover .ba-slider-btn {
+  transform: scale(1.12);
+  box-shadow: 0 6px 28px rgba(201,168,76,.5);
+}
+
 /* =====================
    NOSOTROS
    ===================== */
