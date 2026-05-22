@@ -67,47 +67,6 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* =====================
-   CUSTOM CURSOR
-   ===================== */
-@media (hover: hover) and (pointer: fine) {
-  body { cursor: none; }
-  a, button { cursor: none; }
-}
-
-.cursor-dot {
-  position: fixed;
-  width: 5px; height: 5px;
-  background: var(--gold);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width .2s var(--ease-spring), height .2s var(--ease-spring), opacity .2s;
-  display: none;
-}
-
-.cursor-ring {
-  position: fixed;
-  width: 30px; height: 30px;
-  border: 1.5px solid rgba(201,168,76,.4);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: width .3s var(--ease), height .3s var(--ease), border-color .3s var(--ease), opacity .2s;
-  display: none;
-}
-
-.cursor-ring.is-hover {
-  width: 54px; height: 54px;
-  border-color: var(--gold);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .cursor-dot, .cursor-ring { display: block; }
-}
-
-/* =====================
    TYPOGRAPHY
    ===================== */
 h1, h2, h3, h4 {
