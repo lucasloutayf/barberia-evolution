@@ -27,13 +27,33 @@ function coversSlots(hora: string, duracion: number): string[] {
   return Array.from({ length: n }, (_, i) => minutesToHHMM(start + i * STEP))
 }
 
-const ALLOWED_ORIGINS = new Set(
-  ['http://localhost:5173', Deno.env.get('ALLOWED_ORIGIN')].filter(Boolean) as string[]
+// DB client at module scope — reused across warm requests
+const db = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 )
 
-function corsHeaders(origin: string): Record<string, string> {
+// Allowed origins cache (TTL: 5 min per warm instance)
+let cachedOrigins: Set<string> | null = null
+let cacheAt = 0
+
+async function getAllowedOrigins(): Promise<Set<string>> {
+  if (cachedOrigins && Date.now() - cacheAt < 5 * 60 * 1000) return cachedOrigins
+  const { data } = await db.from('barberias').select('dominio')
+  cachedOrigins = new Set([
+    'http://localhost:5173',
+    ...(data ?? []).flatMap((r: { dominio: string }) => [
+      `https://${r.dominio}`,
+      `https://www.${r.dominio}`,
+    ]),
+  ])
+  cacheAt = Date.now()
+  return cachedOrigins
+}
+
+function corsHeaders(origin: string, allowed: Set<string>): Record<string, string> {
   return {
-    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.has(origin) ? origin : '',
+    'Access-Control-Allow-Origin': allowed.has(origin) ? origin : '',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
@@ -51,7 +71,8 @@ function getClientIp(req: Request): string | null {
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin') ?? ''
-  const cors = corsHeaders(origin)
+  const allowed = await getAllowedOrigins()
+  const cors = corsHeaders(origin, allowed)
 
   const json = (body: unknown, status: number) =>
     new Response(JSON.stringify(body), {
@@ -67,20 +88,13 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { status: 405, headers: cors })
   }
 
-  if (!ALLOWED_ORIGINS.has(origin)) {
+  if (!allowed.has(origin)) {
     return json({ error: 'Solicitud no autorizada.' }, 403)
   }
 
-  const db = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  )
-
-  // Defensive IP extraction — skip rate limiting if IP is not detectable
   const ip = getClientIp(req)
 
   if (ip) {
-    // Non-atomic check-then-insert: concurrent bursts may slip through by up to one extra request per in-flight connection.
     const since = new Date(Date.now() - 15 * 60 * 1000).toISOString()
     const { count } = await db
       .from('_ip_attempts')
@@ -97,7 +111,6 @@ Deno.serve(async (req: Request) => {
 
     await db.from('_ip_attempts').insert({ ip })
 
-    // Best-effort cleanup of records older than 1 hour
     await db
       .from('_ip_attempts')
       .delete()
@@ -111,7 +124,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Cuerpo de solicitud inválido.' }, 400)
   }
 
-  const { nombre, telefono, servicio, fecha, hora, mensaje, turnstileToken } = body
+  const { nombre, telefono, servicio, fecha, hora, mensaje, turnstileToken, barberia_id } = body
 
   if (
     !nombre?.trim() ||
@@ -124,7 +137,6 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Faltan campos requeridos.' }, 400)
   }
 
-  // Verify Turnstile token with Cloudflare Siteverify
   const cfRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -144,11 +156,11 @@ Deno.serve(async (req: Request) => {
 
   const duracion_min = SERVICE_DURATIONS[servicio] ?? STEP
 
-  // Collision check: prevent double-booking
   const { data: existing } = await db
     .from('reservas')
     .select('hora, duracion_min, servicio')
     .eq('fecha', fecha)
+    .eq('barberia_id', barberia_id ?? '')
     .neq('estado', 'cancelada')
 
   const taken = new Set<string>()
@@ -160,7 +172,6 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Ese horario ya está ocupado. Por favor elegí otro.' }, 409)
   }
 
-  // Insert reservation using service-role key (bypasses RLS)
   const { error: insertError } = await db.from('reservas').insert({
     nombre:      nombre.trim(),
     telefono:    telefono.trim(),
@@ -170,6 +181,7 @@ Deno.serve(async (req: Request) => {
     mensaje:     mensaje?.trim() || null,
     duracion_min,
     ip,
+    barberia_id: barberia_id ?? null,
   })
 
   if (insertError) {
