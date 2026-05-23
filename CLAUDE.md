@@ -12,6 +12,17 @@ npm run preview  # Preview production build
 
 There are no test or lint scripts configured for the frontend.
 
+Deploy Edge Functions (Supabase CLI required):
+```bash
+supabase functions deploy get-slots --project-ref ascxplypgexhnyaawudc
+supabase functions deploy create-reserva --project-ref ascxplypgexhnyaawudc
+```
+
+Register a barberia in the `barberias` table (multi-tenant CORS):
+```bash
+npm run register
+```
+
 Always serve via HTTP — never open files directly as `file://` (breaks CDN scripts and Supabase fetch calls).
 
 ## Architecture
@@ -21,7 +32,7 @@ Static site with no framework or bundler transformations — Vite is used only a
 **Files:**
 - `index.html` / `styles.css` / `main.js` — Public landing page
 - `admin.html` / `admin.css` / `admin.js` — Private reservations panel (Supabase Auth login)
-- `barberia.config.js` — **Single source of truth** for all business config (name, address, phone, services catalog, schedule, booking window). Both `main.js` and `bot/config.js` import from this file. Edge Functions duplicate `SERVICE_DURATIONS` inline and must be kept in sync manually.
+- `barberia.config.js` — **Single source of truth** for all business config (name, address, phone, services catalog, schedule, booking window). Also contains `barberia_id` and `dominio` used for multi-tenant registration. Both `main.js` and `bot/config.js` import from this file. Edge Functions duplicate `SERVICE_DURATIONS` inline and must be kept in sync manually.
 
 `vite.config.js` declares both `index.html` and `admin.html` as `rollupOptions.input` entries. Any new HTML page must be added there or it won't be emitted by `vite build`.
 
@@ -38,6 +49,7 @@ Static site with no framework or bundler transformations — Vite is used only a
 **Supabase project:** `ascxplypgexhnyaawudc` (name: `barberia`, region: `sa-east-1`)
 - Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`, `duracion_min` (int), `recordatorio_enviado` (bool), `confirmacion_enviada` (bool), `ip` (text)
 - Table: `public._ip_attempts` — fields: `ip` (text), `attempted_at` (timestamptz, default now()). Used by `create-reserva` for rate limiting (10 requests per IP per 15 min).
+- Table: `public.barberias` — fields: `barberia_id` (text, PK), `dominio` (text), `nombre` (text). Read by both Edge Functions to build the dynamic CORS allowlist (TTL-cached 5 min per warm instance). Populated via `npm run register`.
 - RLS policies: `anon` can INSERT only on `reservas`; `authenticated` can SELECT / UPDATE / DELETE.
 
 ## Key patterns
@@ -60,7 +72,7 @@ Static site with no framework or bundler transformations — Vite is used only a
 
 ## Supabase Edge Functions (`supabase/functions/`)
 
-Deployed as Deno/TypeScript. Both require these Supabase-injected env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Both enforce CORS against an allowlist: `http://localhost:5173` and the `ALLOWED_ORIGIN` env var (set to the production domain when deploying).
+Deployed as Deno/TypeScript. Both require these Supabase-injected env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Both enforce CORS dynamically: allowed origins are `http://localhost:5173` plus every `dominio` in the `public.barberias` table (fetched at runtime, cached 5 min). No `ALLOWED_ORIGIN` env var is needed.
 
 **`get-slots`** — `GET ?fecha=YYYY-MM-DD`. Returns `{ blocked: string[] }` — all 30-min slot strings that are taken on that date (considering multi-slot services via `duracion_min`). Uses `anon` read on `reservas` filtered by date and non-cancelled status.
 
@@ -81,6 +93,10 @@ CREATE TABLE IF NOT EXISTS public._ip_attempts (
   attempted_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS ip_attempts_ip_at_idx ON public._ip_attempts (ip, attempted_at);
+
+-- Reseñas post-turno (agregar si la tabla ya existía antes de esta feature)
+ALTER TABLE public.reservas
+  ADD COLUMN IF NOT EXISTS resena_enviada boolean DEFAULT false;
 ```
 
 ## Bot de WhatsApp (`bot/`)
@@ -91,9 +107,11 @@ Independent Node.js subproject — **not** touched by Vite. Requires Node 20+. R
 cd bot
 npm install
 npm run dev                         # arranca el bot con --watch (escanear QR en consola la primera vez)
+npm start                           # producción: sin --watch
 node --test test-guard.js           # corre las 18 pruebas unitarias de guard.js
 node --test test-confirmaciones.js  # corre las pruebas de buildConfirmacion (format.js)
 node --test test-config.js          # verifica que bot/config.js esté sincronizado con barberia.config.js
+node --test test-resenas.js         # corre las pruebas de buildMensajeResena (resenas.js)
 node test-api.js                    # prueba la conexión al proveedor LLM directamente (sin bot)
 ```
 
@@ -105,9 +123,10 @@ El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona
 - `SUPABASE_SERVICE_ROLE_KEY` — bypasea RLS para SELECT/UPDATE. Nunca exponer al frontend.
 - `AI_BASE_URL` — endpoint OpenAI-compatible (default: `https://api.openai.com/v1`).
 - `AI_API_KEY` — API key de OpenAI.
-- `AI_MODEL` — id del modelo (ej: `gpt-4o-mini`).
+- `AI_MODEL` — id del modelo (default: `qwen-3-235b-a22b-instruct-2507` para Cerebras; ajustar según proveedor).
 - `AI_MODEL_FALLBACK` — modelo alternativo si el primario devuelve 429/503.
 - `ADMIN_JID` — JID del WhatsApp del admin (`<numero>@s.whatsapp.net`).
+- `GOOGLE_MAPS_URL` — URL del perfil de Google Maps del salón para solicitudes de reseña post-turno.
 
 **Catálogo de servicios** (precios y duraciones) vive en [barberia.config.js](barberia.config.js) en la raíz. `bot/config.js` importa desde allí y re-exporta los valores que necesita el bot. Los nombres DEBEN coincidir exactamente con los `<option>` del `<select>` de [index.html](index.html) (que también se genera desde `barberia.config.js`) y con el `SERVICE_DURATIONS` hardcodeado en las Edge Functions.
 
@@ -127,8 +146,11 @@ El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona
 - `confirmaciones.js` — suscripción Supabase Realtime a INSERT en `reservas`; si `confirmacion_enviada` es false, reclama la fila (UPDATE atómico) y envía el mensaje de confirmación por WhatsApp. Al arrancar hace un startup scan de las últimas 24 h para cubrir eventos perdidos mientras el bot estuvo apagado. Notifica al admin si el teléfono es inválido o el envío falla.
 - `format.js` — `buildConfirmacion(reserva)`: genera el texto del mensaje de confirmación de turno (día de semana, DD/MM, hora, servicio, duración, precio). Hace lookup de duración/precio desde el catálogo via `findServiceByNombre()`.
 - `scheduler.js` — cron cada 15 min para recordatorios 24 h antes de la reserva.
-- `admin.js` — comandos WhatsApp exclusivos del admin (`/turnos`, `/cancelar <id>`, `/bloquear <número>`, `/desbloquear <número>`, `/bloqueados`, `/help`); se procesan antes de llegar al LLM.
+- `resenas.js` — cron cada 15 min para solicitudes de reseña Google Maps; envía mensaje 30-90 min después del turno. Requiere `GOOGLE_MAPS_URL` en env.
+- `time-utils.js` — utilidades de fecha/hora compartidas entre `scheduler.js` y `resenas.js`: `fechaHoraAUtc`, `fechaISOEnTZ`, `jidFromTelefono`.
 - `supabase.js` — cliente Supabase con service-role key; todas las queries del bot pasan por aquí.
+
+**Advertencia operativa:** Baileys es no oficial. Usar siempre un número de WhatsApp dedicado del salón — nunca el personal del dueño. No enviar mensajes masivos (riesgo de ban del número).
 
 **Archivos de runtime (gitignoreados):**
 - `state.json` — snapshot de conversaciones por JID
