@@ -14,13 +14,15 @@ export function buildMensajeResena(reserva) {
   const nombre = reserva.nombre || 'Hola';
   return [
     `Hola ${nombre}! Esperamos que hayas disfrutado tu visita a *${cfg.nombre}* 💈`,
+    ``,
     `¿Cómo fue tu experiencia? Tu opinión nos ayuda mucho:`,
     `⭐ Dejanos una reseña: ${GOOGLE_MAPS_URL}`,
+    ``,
     `¡Hasta la próxima!`,
   ].join('\n');
 }
 
-async function runOnce() {
+export async function runOnce() {
   const { pendingResenas, markResenaSent } = await import('./supabase.js');
   const { getSock } = await import('./whatsapp.js');
 
@@ -30,6 +32,9 @@ async function runOnce() {
   const fechaMin = fechaISOEnTZ(minDate);
   const fechaMax = fechaISOEnTZ(maxDate);
 
+  // Nota: cuando la ventana cruza medianoche, fechaMin puede ser el día anterior.
+  // La query trae todas las reservas de ese rango de fechas y el filtro fino por hora
+  // exacta descarta las que no caen en la ventana. El volumen es bajo para un salón.
   let candidatas;
   try {
     candidatas = await pendingResenas(fechaMin, fechaMax);
@@ -70,5 +75,5 @@ export function startResenas() {
   cron.schedule(CRON_EXPR, () => {
     runOnce().catch(err => console.error('[resenas] tick error:', err));
   });
-  console.log(`[resenas] activo (${CRON_EXPR})`);
+  console.log(`[resenas] activo (${CRON_EXPR}, ventana ${WINDOW_MIN_MIN}-${WINDOW_MAX_MIN} min post-turno)`);
 }
