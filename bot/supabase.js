@@ -132,3 +132,22 @@ export async function pendingConfirmaciones() {
   if (error) throw error;
   return data ?? [];
 }
+
+// Reseñas post-turno: reservas no canceladas, sin reseña enviada, cuya fecha
+// está dentro del rango [fechaIni, fechaFin]. El cron filtra fino por hora exacta.
+export async function pendingResenas(fechaIni, fechaFin) {
+  const { data, error } = await sb
+    .from(TABLE)
+    .select('*')
+    .eq('barberia_id', cfg.barberia_id)
+    .neq('estado', 'cancelada')
+    .eq('resena_enviada', false)
+    .gte('fecha', fechaIni)
+    .lte('fecha', fechaFin);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function markResenaSent(id) {
+  return updateReserva(id, { resena_enviada: true });
+}
