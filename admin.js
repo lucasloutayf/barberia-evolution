@@ -55,7 +55,7 @@ async function handleLogin() {
 
 async function showDashboard() {
   const { data: { user } } = await getDb().auth.getUser()
-  BARBERIA_ID = user?.user_metadata?.barberia_id ?? null
+  BARBERIA_ID = user?.app_metadata?.barberia_id ?? null
 
   if (!BARBERIA_ID) {
     alert('Este usuario no tiene una barbería asignada. Contactá al administrador.')

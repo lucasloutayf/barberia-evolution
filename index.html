@@ -554,8 +554,9 @@
             </div>
             <div class="form-group">
               <label for="rf-telefono">Teléfono *</label>
-              <input type="tel" id="rf-telefono" name="telefono" placeholder="Ej: 351 123-4567" required
-                autocomplete="tel">
+              <input type="tel" id="rf-telefono" name="telefono" placeholder="Ej: 3511234567" required
+                autocomplete="tel" inputmode="numeric" pattern="[0-9]{10,}">
+              <small class="form-hint">Solo números, sin espacios ni símbolos. No pongas +54 9 — escribí directo el código de área y el número (ej: 3511234567).</small>
             </div>
           </div>
           <div class="form-group">

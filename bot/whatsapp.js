@@ -185,7 +185,7 @@ export async function connectToWhatsApp() {
       // se procesan uno tras otro (no en paralelo). NO esperamos esta promesa
       // acá para no bloquear la cola global de Baileys con un único cliente
       // lento.
-      if (text.startsWith('/')) continue;
+      if (text.startsWith('/')) { guard.queueDecrement(from); continue; }
 
       /* if (!isWithinBusinessHours()) {
         const lastNotified = closedNotifiedAt.get(from) || 0;

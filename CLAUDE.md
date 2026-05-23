@@ -16,6 +16,8 @@ Deploy Edge Functions (Supabase CLI required):
 ```bash
 supabase functions deploy get-slots --project-ref ascxplypgexhnyaawudc
 supabase functions deploy create-reserva --project-ref ascxplypgexhnyaawudc
+supabase functions deploy get-turno --project-ref ascxplypgexhnyaawudc
+supabase functions deploy cancel-turno --project-ref ascxplypgexhnyaawudc
 ```
 
 Register a barberia in the `barberias` table (multi-tenant CORS):
@@ -32,9 +34,10 @@ Static site with no framework or bundler transformations — Vite is used only a
 **Files:**
 - `index.html` / `styles.css` / `main.js` — Public landing page
 - `admin.html` / `admin.css` / `admin.js` — Private reservations panel (Supabase Auth login)
+- `turno.html` / `turno.css` / `turno.js` — Public self-service page; clients access it via tokenized link (`?t=TOKEN`) to view or cancel their appointment. Calls `get-turno` and `cancel-turno` Edge Functions directly (no Supabase client, no auth).
 - `barberia.config.js` — **Single source of truth** for all business config (name, address, phone, services catalog, schedule, booking window). Also contains `barberia_id` and `dominio` used for multi-tenant registration. Both `main.js` and `bot/config.js` import from this file. Edge Functions duplicate `SERVICE_DURATIONS` inline and must be kept in sync manually.
 
-`vite.config.js` declares both `index.html` and `admin.html` as `rollupOptions.input` entries. Any new HTML page must be added there or it won't be emitted by `vite build`.
+`vite.config.js` declares `index.html`, `admin.html`, and `turno.html` as `rollupOptions.input` entries. Any new HTML page must be added there or it won't be emitted by `vite build`.
 
 **External dependencies (CDN, not npm):**
 - Supabase JS client via `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">` — exposes `window.supabase`. Always reference as `window.supabase.createClient(...)` in scripts that Vite may treat as modules.
@@ -47,7 +50,7 @@ Static site with no framework or bundler transformations — Vite is used only a
 - See `.env.example` for the format. The build will fail silently (runtime error in browser) if these are missing.
 
 **Supabase project:** `ascxplypgexhnyaawudc` (name: `barberia`, region: `sa-east-1`)
-- Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`, `duracion_min` (int), `recordatorio_enviado` (bool), `confirmacion_enviada` (bool), `ip` (text)
+- Table: `public.reservas` — fields: `id`, `nombre`, `telefono`, `servicio`, `fecha` (date), `hora` (text), `mensaje`, `estado` (`pendiente`|`confirmada`|`cancelada`), `created_at`, `duracion_min` (int), `recordatorio_enviado` (bool), `confirmacion_enviada` (bool), `resena_enviada` (bool), `ip` (text), `token` (text, UNIQUE)
 - Table: `public._ip_attempts` — fields: `ip` (text), `attempted_at` (timestamptz, default now()). Used by `create-reserva` for rate limiting (10 requests per IP per 15 min).
 - Table: `public.barberias` — fields: `barberia_id` (text, PK), `dominio` (text), `nombre` (text). Read by both Edge Functions to build the dynamic CORS allowlist (TTL-cached 5 min per warm instance). Populated via `npm run register`.
 - RLS policies: `anon` can INSERT only on `reservas`; `authenticated` can SELECT / UPDATE / DELETE.
@@ -72,11 +75,15 @@ Static site with no framework or bundler transformations — Vite is used only a
 
 ## Supabase Edge Functions (`supabase/functions/`)
 
-Deployed as Deno/TypeScript. Both require these Supabase-injected env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Both enforce CORS dynamically: allowed origins are `http://localhost:5173` plus every `dominio` in the `public.barberias` table (fetched at runtime, cached 5 min). No `ALLOWED_ORIGIN` env var is needed.
+Deployed as Deno/TypeScript. All four require these Supabase-injected env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. All enforce CORS dynamically: allowed origins are `http://localhost:5173` plus every `dominio` in the `public.barberias` table (fetched at runtime, cached 5 min). No `ALLOWED_ORIGIN` env var is needed.
 
 **`get-slots`** — `GET ?fecha=YYYY-MM-DD`. Returns `{ blocked: string[] }` — all 30-min slot strings that are taken on that date (considering multi-slot services via `duracion_min`). Uses `anon` read on `reservas` filtered by date and non-cancelled status.
 
 **`create-reserva`** — `POST`. Validates Turnstile token with Cloudflare Siteverify (requires `TURNSTILE_SECRET_KEY` env var), rate-limits by IP via `_ip_attempts` table (10/15 min), checks slot collisions, then INSERTs into `reservas` using service-role key (bypasses RLS).
+
+**`get-turno`** — `GET ?t=TOKEN`. Returns `{ id, nombre, fecha, hora, servicio, estado }` for the matching `token` column. Used by `turno.html` to display appointment details to the client.
+
+**`cancel-turno`** — `POST { token }`. Validates token, rejects past-date and already-cancelled appointments, then sets `estado = 'cancelada'`. Called by `turno.html` when the client self-cancels.
 
 **Critical sync requirement:** Both Edge Functions contain a hardcoded `SERVICE_DURATIONS` map that must stay in sync with `barberia.config.js servicios[].{nombre, duracion}`. There is no shared module between Deno functions and the Node/browser code — update all three locations when adding or renaming services.
 
@@ -97,6 +104,12 @@ CREATE INDEX IF NOT EXISTS ip_attempts_ip_at_idx ON public._ip_attempts (ip, att
 -- Reseñas post-turno (agregar si la tabla ya existía antes de esta feature)
 ALTER TABLE public.reservas
   ADD COLUMN IF NOT EXISTS resena_enviada boolean DEFAULT false;
+
+-- Token de autogestión de turnos (link tokenizado)
+ALTER TABLE public.reservas
+  ADD COLUMN IF NOT EXISTS token text UNIQUE;
+
+CREATE UNIQUE INDEX IF NOT EXISTS reservas_token_idx ON public.reservas (token);
 ```
 
 ## Bot de WhatsApp (`bot/`)
@@ -127,6 +140,7 @@ El cliente LLM en [bot/agent.js](bot/agent.js) es OpenAI-compatible — funciona
 - `AI_MODEL_FALLBACK` — modelo alternativo si el primario devuelve 429/503.
 - `ADMIN_JID` — JID del WhatsApp del admin (`<numero>@s.whatsapp.net`).
 - `GOOGLE_MAPS_URL` — URL del perfil de Google Maps del salón para solicitudes de reseña post-turno.
+- `APP_URL` — URL pública del frontend (ej: `https://tu-dominio.com`). Usado en confirmaciones de WhatsApp para incluir link de autogestión de turno. Sin este valor, el link no se agrega al mensaje.
 
 **Catálogo de servicios** (precios y duraciones) vive en [barberia.config.js](barberia.config.js) en la raíz. `bot/config.js` importa desde allí y re-exporta los valores que necesita el bot. Los nombres DEBEN coincidir exactamente con los `<option>` del `<select>` de [index.html](index.html) (que también se genera desde `barberia.config.js`) y con el `SERVICE_DURATIONS` hardcodeado en las Edge Functions.
 

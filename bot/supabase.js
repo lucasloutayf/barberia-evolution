@@ -3,6 +3,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import cfg from '../barberia.config.js';
+import { todayISO } from './slots.js';
 
 const url = process.env.VITE_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -49,7 +50,7 @@ export async function findById(id) {
 }
 
 export async function findFuturasByTelefono(telefono) {
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = todayISO();
   // Busca ambas variantes: con prefijo argentino "549..." y sin él, para
   // cubrir reservas hechas desde la web (sin prefijo) vs. el bot (con 549).
   const base = telefono.replace(/^\+?549?/, '');

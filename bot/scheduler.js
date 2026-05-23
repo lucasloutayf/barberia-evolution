@@ -3,6 +3,7 @@
 // cuyo (fecha+hora) cae en la ventana [now+23h, now+25h] en TZ del salón.
 
 import cron from 'node-cron';
+import cfg from '../barberia.config.js';
 import { pendingReminders, markReminderSent } from './supabase.js';
 import { getSock } from './whatsapp.js';
 import { fechaHoraAUtc, fechaISOEnTZ, jidFromTelefono } from './time-utils.js';
@@ -18,7 +19,7 @@ function formatHora(hhmm) {
 function buildMensaje(reserva) {
   const nombre = reserva.nombre || 'Hola';
   return [
-    `Hola ${nombre}! Te recordamos tu turno en *Evolution Spa & Peluquería*:`,
+    `Hola ${nombre}! Te recordamos tu turno en *${cfg.nombre}*:`,
     ``,
     `📅 ${reserva.fecha} a las ${formatHora(reserva.hora)} hs`,
     `💇 ${reserva.servicio}`,

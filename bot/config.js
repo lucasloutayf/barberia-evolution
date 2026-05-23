@@ -38,6 +38,8 @@ export const BOOKING_WINDOW_DAYS = cfg.ventanaReservaDias;
 
 export const ADMIN_JID = process.env.ADMIN_JID || '';
 
+export const APP_URL = process.env.APP_URL || '';
+
 export function findServiceByNombre(nombre) {
   if (!nombre) return null;
   const target = nombre.trim().toLowerCase();

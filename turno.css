@@ -1,0 +1,174 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:        #07060A;
+  --ink-3:      #161419;
+  --ink-4:      #1F1D23;
+  --gold:       #C9A84C;
+  --gold-glow:  rgba(201,168,76,.22);
+  --text:       #EAE6DC;
+  --text-dim:   rgba(234,230,220,.52);
+  --border:     rgba(255,255,255,.055);
+  --border-gold:rgba(201,168,76,.16);
+  --r-md:       12px;
+  --r-lg:       20px;
+  --shadow-lg:  0 24px 80px rgba(0,0,0,.6);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--ink);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.card {
+  background: var(--ink-3);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  width: 100%;
+}
+
+.card-logo {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.card-logo .logo-mark {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+h1 {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.turno-row {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.turno-row:last-child { border-bottom: none; }
+
+.turno-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  width: 1.5rem;
+  text-align: center;
+  margin-top: .05rem;
+}
+
+.turno-label {
+  font-size: .75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: .15rem;
+}
+
+.turno-value {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: .2em .75em;
+  border-radius: 99px;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.estado-pendiente  { background: rgba(201,168,76,.15); color: var(--gold); }
+.estado-confirmada { background: rgba(80,200,120,.12); color: #50C878; }
+.estado-cancelada  { background: rgba(255,80,80,.12);  color: #ff6060; }
+
+.actions { margin-top: 2rem; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .85rem 1.75rem;
+  border-radius: var(--r-md);
+  font-family: 'Syne', sans-serif;
+  font-size: .9rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+  border: none;
+  width: 100%;
+}
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn:not(:disabled):hover { opacity: .85; }
+.btn:not(:disabled):active { transform: scale(.98); }
+
+.btn-danger {
+  background: #7a1c1c;
+  color: #ffb3b3;
+  border: 1px solid rgba(255,80,80,.25);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  margin-top: .75rem;
+}
+
+.msg {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--r-md);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+.msg-error   { background: rgba(255,80,80,.10); border: 1px solid rgba(255,80,80,.25); color: #ffb3b3; }
+.msg-success { background: rgba(80,200,120,.10); border: 1px solid rgba(80,200,120,.2); color: #a8f0c0; }
+.msg-info    { background: rgba(201,168,76,.10); border: 1px solid var(--border-gold); color: var(--gold); }
+
+.spinner {
+  display: inline-block;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 2px solid var(--border-gold);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  color: var(--text-dim);
+}

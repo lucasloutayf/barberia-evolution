@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Turno | Evolution Spa & Peluquería</title>
+  <link rel="stylesheet" href="turno.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:wght@400;600;700&family=Syne:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+<body>
+  <div class="card">
+    <div class="card-logo">
+      <span class="logo-mark">E</span>
+      <span>volution Spa & Peluquería</span>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingState">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <span>Cargando tu turno…</span>
+      </div>
+    </div>
+
+    <!-- Turno info -->
+    <div id="turnoInfo" style="display:none">
+      <h1>Tu turno</h1>
+      <div id="turnoDetails"></div>
+      <div class="actions" id="turnoActions" style="display:none">
+        <button class="btn btn-danger" id="cancelBtn">Cancelar turno</button>
+        <button class="btn btn-ghost" id="confirmCancelBtn" style="display:none">
+          Sí, cancelar definitivamente
+        </button>
+      </div>
+      <div id="turnoMsg" style="display:none"></div>
+    </div>
+
+    <!-- Error -->
+    <div id="errorState" style="display:none">
+      <div id="errorMsg" class="msg msg-error"></div>
+    </div>
+  </div>
+
+  <script src="turno.js" type="module"></script>
+</body>
+</html>

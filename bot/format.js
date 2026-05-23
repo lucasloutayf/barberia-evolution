@@ -1,4 +1,4 @@
-import { findServiceByNombre, TZ } from './config.js';
+import { findServiceByNombre, TZ, APP_URL } from './config.js';
 
 const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -26,7 +26,7 @@ export function buildConfirmacion(reserva) {
   const precio = svc?.precio;
 
   const [y, mo, d] = reserva.fecha.split('-').map(Number);
-  const diaSemana = DIAS[new Date(y, mo - 1, d).getDay()];
+  const diaSemana = DIAS[new Date(Date.UTC(y, mo - 1, d, 12)).getUTCDay()];
   const dd = String(d).padStart(2, '0');
   const mm = String(mo).padStart(2, '0');
 
@@ -45,5 +45,8 @@ export function buildConfirmacion(reserva) {
   if (precio != null) lines.push(`💲 Precio: $${precio.toLocaleString('es-AR')}`);
   if (reserva.mensaje?.trim()) lines.push(`📝Comentario: ${reserva.mensaje.trim()}`);
   lines.push(``, `Cualquier cosa, avisame. ${cierre}`);
+  if (APP_URL && reserva.token) {
+    lines.push(``, `🔗 Gestioná tu turno: ${APP_URL}/turno?t=${reserva.token}`);
+  }
   return lines.join('\n');
 }

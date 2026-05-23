@@ -7,11 +7,23 @@
       "skillPath": "skills/accessibility/SKILL.md",
       "computedHash": "ebfa09617a2ac4fd64afd73267726b787145a8d14294df3f8802b462c91594ab"
     },
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "228f87d57035100d9dc6efcfc05aafd4b6e3962adacaa04b8217ab2fadb15dc8"
+    },
     "alert-manager": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
       "sourceType": "github",
       "skillPath": "monitor/alert-manager/SKILL.md",
       "computedHash": "8bc9d546a67c8af1ef53e5b58dd8dd27237604fc87a2945e6f4398e6f0d65697"
+    },
+    "api-and-interface-design": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/api-and-interface-design/SKILL.md",
+      "computedHash": "0fabf9c3fc2577eab57833f660efef943b78d5c6ae5f0d8e82b600cc22563dbc"
     },
     "backlink-analyzer": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
@@ -24,6 +36,36 @@
       "sourceType": "github",
       "skillPath": "skills/best-practices/SKILL.md",
       "computedHash": "f84707a5ba30771f4c3e672846457e4b0ed4dff5fd268bf0fe6cd17583637671"
+    },
+    "browser-testing-with-devtools": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/browser-testing-with-devtools/SKILL.md",
+      "computedHash": "57c0a0e77fc664e0559f4808b9c2b57197ebb852c114a7b1fea174af748f16dd"
+    },
+    "caveman": {
+      "source": "juliusbrussee/caveman",
+      "sourceType": "github",
+      "skillPath": "skills/caveman/SKILL.md",
+      "computedHash": "7935e83f9c6a8b7cbb5404d144b0d19e3ba93583f4388301c3dada37cd25adf8"
+    },
+    "ci-cd-and-automation": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ci-cd-and-automation/SKILL.md",
+      "computedHash": "f927700883a2b0f47d150d6ba27faf9006046641404480167d0b860564d11176"
+    },
+    "code-review-and-quality": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-review-and-quality/SKILL.md",
+      "computedHash": "31afa3c52991ed84a1f0b97d5a9dc9f1ada08307108e88c3102de7c41a50c0a4"
+    },
+    "code-simplification": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-simplification/SKILL.md",
+      "computedHash": "aa9393832e77d2a89d91a8004dfb9d32670f4dcb46f2fd873c1dcad53e1f1f61"
     },
     "competitor-analysis": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
@@ -49,11 +91,29 @@
       "skillPath": "optimize/content-refresher/SKILL.md",
       "computedHash": "2d3e9bdca936078d10e3c7842344680bbb9473dfbde3c317224996fc62e1888c"
     },
+    "context-engineering": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/context-engineering/SKILL.md",
+      "computedHash": "1296ce5de6ca27323e8ad6dba640744770bc868c8cf49d0934b484c553c80243"
+    },
     "core-web-vitals": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/core-web-vitals/SKILL.md",
       "computedHash": "4684e264c8e3dd529aefe97c3102814e3b63a9ea21a163d0f835ed506773e3f8"
+    },
+    "debugging-and-error-recovery": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/debugging-and-error-recovery/SKILL.md",
+      "computedHash": "00f95b1754573cbc5f01e3cec5b40759dcd0be97b3abcaffec05fb70422e5bc6"
+    },
+    "deprecation-and-migration": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/deprecation-and-migration/SKILL.md",
+      "computedHash": "3671326de345b4a60a19c6d665bd0c3c6761792df0b553cf54200901d8f756b2"
     },
     "design-taste-frontend": {
       "source": "leonxlnx/taste-skill",
@@ -61,11 +121,23 @@
       "skillPath": "skills/taste-skill/SKILL.md",
       "computedHash": "d823593e24d7493ab740db8f082cbe3b148ed29af9e804d11f5302ad79e4b96d"
     },
+    "documentation-and-adrs": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/documentation-and-adrs/SKILL.md",
+      "computedHash": "d751b98cb2894feb833af869f397aaaadd9a3a679882331c1a5b254e8ed1399a"
+    },
     "domain-authority-auditor": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
       "sourceType": "github",
       "skillPath": "cross-cutting/domain-authority-auditor/SKILL.md",
       "computedHash": "63bb7cb605b62bb5c7cebaff70b4ec72243de523e1b1cd3786d8b603c960be5e"
+    },
+    "doubt-driven-development": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/doubt-driven-development/SKILL.md",
+      "computedHash": "1595be2b80bb3ac1029431e8e63023cf1954b19106738480967fa93c2fe56a64"
     },
     "emil-design-eng": {
       "source": "emilkowalski/skill",
@@ -85,11 +157,29 @@
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "9e1c8b3103f92fa8092568a44fe64858de7c5c9dc65ce4bea8f168080e889cfd"
     },
+    "frontend-ui-engineering": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-ui-engineering/SKILL.md",
+      "computedHash": "195659873a8fe0bac6947e44731c3e23b97ec2caf2c124ce4c808658c555f98d"
+    },
     "geo-content-optimizer": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
       "sourceType": "github",
       "skillPath": "build/geo-content-optimizer/SKILL.md",
       "computedHash": "912c24aa1abeebbf1acd16b60ed9bfa33e370e977141d829e01069a845234ab8"
+    },
+    "git-workflow-and-versioning": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/git-workflow-and-versioning/SKILL.md",
+      "computedHash": "f4687d5f0edc5693f1414546cd02909b22f4de61ef89d17254ed1ee7cdcffab5"
+    },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "daf64ca15f4fa081a6747766db538e2dbd1131725ed4fcdd3d538dc62c7035ba"
     },
     "humanizer": {
       "source": "blader/humanizer",
@@ -97,17 +187,35 @@
       "skillPath": "SKILL.md",
       "computedHash": "72c839bc19c593fbdec017c81f0243578e85bbc4d109c3fac15e5c4ff39fb3da"
     },
+    "idea-refine": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/idea-refine/SKILL.md",
+      "computedHash": "525f928bccf704e28f5be90f55d0bba94517e566034a45b92b71e2ae11a7ad0b"
+    },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "skillPath": "skill/SKILL.md",
       "computedHash": "e08cc9be673b6b5e66eb55cf77eb50a940fc603245b2f75d8370a2043aa926aa"
     },
+    "incremental-implementation": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/incremental-implementation/SKILL.md",
+      "computedHash": "27a55fa6a8ca32d2f16198ad0585511ba41c489a527c9a4b51c96ad7f1a3ffce"
+    },
     "internal-linking-optimizer": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
       "sourceType": "github",
       "skillPath": "optimize/internal-linking-optimizer/SKILL.md",
       "computedHash": "7909c30b1fce6fbcbcbfb1870f8144173633655a400b147a6a70cf09e6e14cc3"
+    },
+    "interview-me": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/interview-me/SKILL.md",
+      "computedHash": "85726440a832ced82cc55c5b550daba3f693db1013d771dc7b8e41c6b565ba8e"
     },
     "keyword-research": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
@@ -139,11 +247,23 @@
       "skillPath": "skills/performance/SKILL.md",
       "computedHash": "646931a3af896ae12a3cad3d762668cb6487fe3ab179daf8fdc974fb79acfe49"
     },
+    "performance-optimization": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/performance-optimization/SKILL.md",
+      "computedHash": "e143bfc3b19f8009b3399bdd96deba13e4edb6cdbd9f7f30b570ba5ea49e3613"
+    },
     "performance-reporter": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
       "sourceType": "github",
       "skillPath": "monitor/performance-reporter/SKILL.md",
       "computedHash": "01cc6c738b010c22ee35c183738ba25cfc5c1a345f6fd3bdaad0f61b78887e4f"
+    },
+    "planning-and-task-breakdown": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/planning-and-task-breakdown/SKILL.md",
+      "computedHash": "c0d5b44e73aca912582038b8a663cdb9efb043e4c2b024a89d47808e23b134c9"
     },
     "rank-tracker": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
@@ -156,6 +276,12 @@
       "sourceType": "github",
       "skillPath": "build/schema-markup-generator/SKILL.md",
       "computedHash": "5233292b95c06a9b7f0f4d6fb077a726cf49d5a96591ca3fe3a001bad7f1bbbb"
+    },
+    "security-and-hardening": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/security-and-hardening/SKILL.md",
+      "computedHash": "d93979be45e9303a59f68dd1be0d976fbafe59b8e23c32d3c6f609f1e6c81373"
     },
     "seo": {
       "source": "addyosmani/web-quality-skills",
@@ -175,11 +301,41 @@
       "skillPath": "research/serp-analysis/SKILL.md",
       "computedHash": "0df341d7e06fa4b24c2763eeede3e867aaf7a993c3279be707fecf0e6fa0d3bf"
     },
+    "shipping-and-launch": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipping-and-launch/SKILL.md",
+      "computedHash": "59adff2e4da83a3e01f9944f2cfb1bb50b8b98f1c39ec376032b13c6ae2096fa"
+    },
+    "source-driven-development": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/source-driven-development/SKILL.md",
+      "computedHash": "c8af82fc8af511521f7881fecd312752c14af3081e933388414e1c5da108d2fe"
+    },
+    "spec-driven-development": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spec-driven-development/SKILL.md",
+      "computedHash": "a646faab486907990abf2b5faa329e168e11b83c8a64f68ca2a8568ec3984276"
+    },
     "technical-seo-checker": {
       "source": "aaron-he-zhu/seo-geo-claude-skills",
       "sourceType": "github",
       "skillPath": "optimize/technical-seo-checker/SKILL.md",
       "computedHash": "10514609b1e7c3f1f00742a7b7be92ac664a0001ed8b0e53dfc6d42faa1289d7"
+    },
+    "test-driven-development": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "computedHash": "909cbc5298acd30d064ba014463ebdecbabc253caf7986ba8cc25633af86f3df"
+    },
+    "using-agent-skills": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/using-agent-skills/SKILL.md",
+      "computedHash": "ed039e1a0d9bb4ee72ac4458f9b8ea384b0604e9af93ceefd211b37b7fe807af"
     },
     "web-quality-audit": {
       "source": "addyosmani/web-quality-skills",

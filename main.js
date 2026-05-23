@@ -64,7 +64,7 @@ initConfig()
     let blocked = new Set();
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-slots?fecha=${fechaISO}`
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-slots?fecha=${fechaISO}&barberia_id=${cfg.barberia_id}`
       );
       if (res.ok) {
         const data = await res.json();
@@ -233,6 +233,18 @@ initConfig()
 
     if (!valid) {
       errorMsg.textContent = 'Por favor completá todos los campos requeridos.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    const telefonoRaw = form.telefono.value.trim();
+    const soloDigitos = /^\d+$/.test(telefonoRaw);
+    if (!soloDigitos || telefonoRaw.length < 10) {
+      const telField = document.getElementById('rf-telefono');
+      telField.classList.add('error');
+      errorMsg.textContent = soloDigitos
+        ? 'El teléfono debe tener al menos 10 dígitos (ej: 3511234567).'
+        : 'El teléfono solo puede contener números, sin espacios ni símbolos.';
       errorMsg.classList.add('show');
       return;
     }

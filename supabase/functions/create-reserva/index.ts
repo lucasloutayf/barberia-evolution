@@ -60,6 +60,22 @@ function corsHeaders(origin: string, allowed: Set<string>): Record<string, strin
   }
 }
 
+async function generateToken(secret: string, reservaId: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(reservaId))
+  return Array.from(new Uint8Array(sig))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32)
+}
+
 function getClientIp(req: Request): string | null {
   return (
     req.headers.get('cf-connecting-ip') ??
@@ -132,7 +148,8 @@ Deno.serve(async (req: Request) => {
     !servicio?.trim() ||
     !fecha?.trim() ||
     !hora?.trim() ||
-    !turnstileToken?.trim()
+    !turnstileToken?.trim() ||
+    !barberia_id?.trim()
   ) {
     return json({ error: 'Faltan campos requeridos.' }, 400)
   }
@@ -172,7 +189,11 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Ese horario ya está ocupado. Por favor elegí otro.' }, 409)
   }
 
+  const reservaId = crypto.randomUUID()
+  const token = await generateToken(Deno.env.get('TOKEN_SECRET')!, reservaId)
+
   const { error: insertError } = await db.from('reservas').insert({
+    id:          reservaId,
     nombre:      nombre.trim(),
     telefono:    telefono.trim(),
     servicio,
@@ -182,6 +203,7 @@ Deno.serve(async (req: Request) => {
     duracion_min,
     ip,
     barberia_id: barberia_id ?? null,
+    token,
   })
 
   if (insertError) {
@@ -191,5 +213,5 @@ Deno.serve(async (req: Request) => {
     )
   }
 
-  return json({ ok: true }, 200)
+  return json({ ok: true, token, reserva_id: reservaId }, 200)
 })

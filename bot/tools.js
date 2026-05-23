@@ -1,6 +1,7 @@
 // Funciones expuestas al LLM como "tools" (function calling estilo OpenAI).
 // Cada una valida sus inputs (no confía en el modelo) y devuelve { ok, data?, error? }.
 
+import { createHmac, randomUUID } from 'crypto';
 import { SERVICES, findServiceByNombre, findServiceFuzzy } from './config.js';
 import {
   generateAllSlots, slotsForService, hasCollision,
@@ -11,6 +12,14 @@ import {
   findById, findFuturasByTelefono,
 } from './supabase.js';
 import { buildConfirmacion } from './format.js';
+
+// ---------- Helpers ----------
+
+function generateToken(reservaId) {
+  const secret = process.env.TOKEN_SECRET;
+  if (!secret) return null;
+  return createHmac('sha256', secret).update(reservaId).digest('hex').slice(0, 32);
+}
 
 // ---------- Implementaciones ----------
 
@@ -87,7 +96,10 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
     };
   }
 
+  const reservaId = randomUUID();
+  const token = generateToken(reservaId);
   const reserva = await insertReserva({
+    id: reservaId,
     nombre: nombre.trim(),
     telefono,
     servicio: svc.nombre,
@@ -98,6 +110,7 @@ export async function crear_reserva({ nombre, telefono, servicio, fecha, hora, m
     estado: 'pendiente',
     recordatorio_enviado: false,
     confirmacion_enviada: true,
+    ...(token ? { token } : {}),
   });
 
   return {
