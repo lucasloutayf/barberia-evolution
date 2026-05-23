@@ -36,6 +36,7 @@ const { loadState }           = await import('./state.js');
 const { load: loadGuard }     = await import('./guard.js');
 const { connectToWhatsApp }   = await import('./whatsapp.js');
 const { startScheduler }      = await import('./scheduler.js');
+const { startResenas }        = await import('./resenas.js');
 const { startConfirmaciones } = await import('./confirmaciones.js');
 
 try {
@@ -43,6 +44,7 @@ try {
   await loadGuard();
   await connectToWhatsApp();
   startScheduler();
+  startResenas();
   await startConfirmaciones();
 } catch (err) {
   console.error('[fatal]', err);
