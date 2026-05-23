@@ -1,5 +1,6 @@
 export default {
   barberia_id: 'evolution-spa',
+  dominio:     'lucasloutayf.com',
   nombre: 'Evolution Spa & Peluquería',
   direccion: 'Mariano Fragueiro 11, Córdoba',
   telefono: '3513115571',
